@@ -1,14 +1,10 @@
 /***************************************************************************************
-
  Cholesky Decomposition
-
 
  Reference: Section 2.9, pp. 89-91, Numerical Recipes in Fortran, William Press, et al.
 
 ***************************************************************************************/
-
-#if!defined INC_CHOLESKYSECOM
-#define INC_CHOLESKYSECOM
+#pragma once
 
 #include <windows.h>
 

@@ -98,6 +98,12 @@ output/
 # Windows
 Thumbs.db
 ehthumbs.db
+
+# Windows reserved device names
+nul
+con
+prn
+aux
 Desktop.ini
 $RECYCLE.BIN/
 *.lnk

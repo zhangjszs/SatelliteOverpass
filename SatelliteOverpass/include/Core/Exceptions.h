@@ -1,13 +1,16 @@
 /**
  * @file Exceptions.h
- * @brief 现代错误处理模块
+ * @brief 现代C++20错误处理模块
  *
  * 提供卫星过顶预报系统的异常类和错误处理机制。
- * 使用现代C++异常处理规范，支持错误代码和消息传递。
+ * 使用C++20特性：
+ * - std::source_location 自动捕获错误位置
+ * - std::format 格式化错误消息
+ * - 模板化的Result<T>类型
  *
  * @author kerwin_zhang
  * @version 2.0.0
- * @date 2026-02-08
+ * @date 2026-02-11
  */
 
 #pragma once

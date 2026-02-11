@@ -137,7 +137,12 @@ BOOL cTLE2PosVel::ReadTLE( int nNORADID, char *szFileName )
 
 BOOL cTLE2PosVel::SetOrbitalElements( stSatelliteIOE stIOE )
 {
-	m_bInit = FALSE;
+	if( stIOE.nSatelliteID <= 0 ) {
+		m_nError = 1;
+		return false;
+	}
+
+	m_bInit = false;
 
 	m_pdfTLE[ 3 ] = m_dfBSTAR = stIOE.pfElement7to18[ 2 ];
 	m_dfRefJD = stIOE.GetRefJD();
@@ -308,13 +313,22 @@ BOOL cTLE2PosVel::ComputeInertialPosVel( double &dfIntJDUTCGivenEpoch, double &d
 
 BOOL cTLE2PosVel::ComputeECEFPosVel( double dfJD, double *pdfPos, double *pdfVel )
 {
-	if( !m_bInit ) return FALSE;
+	if( !m_bInit ) return false;
 
-	if( !ComputeInertialPosVel( dfJD, pdfPos, pdfVel ) ) return FALSE;
+	if( dfJD < 0.0 ) {
+		m_nError = 1;
+		return false;
+	}
 
+	if( pdfPos == nullptr || pdfVel == nullptr ) {
+		m_nError = 1;
+		return false;
+	}
+
+	if( !ComputeInertialPosVel( dfJD, pdfPos, pdfVel ) ) return false;
 	FromInertialToEFEC( dfJD, pdfPos, pdfVel );	
 
-	return TRUE;
+	return true;
 }
 
 

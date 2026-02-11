@@ -2,13 +2,10 @@
 
  Orbit computation using two body theory
 
-
  Reference: IAU SOFA EPV00 for Model 1
-  
-***************************************************************************/
 
-#ifndef TWOBODY_H
-#define TWOBODY_H
+***************************************************************************/
+#pragma once
 
 #include <windows.h>
 #include <math.h>
