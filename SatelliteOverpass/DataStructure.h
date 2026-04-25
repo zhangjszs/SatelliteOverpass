@@ -3,6 +3,7 @@
  Data Structure Defined in This Software
 
  Author: Jizhang Sang, Feb-Apr, 2002
+ Modernized: kerwin_zhang, 2026
 
  (C) COPYRIGHT -Electro Optic Systems Australia (EOS) 2002,
  All rights reserved. No part of this program may be photocopied, 
@@ -13,32 +14,32 @@
   
 **********************************************************************************/
 
-#if!defined INC_DATASTRUCTURE
-#define INC_DATASTRUCTURE
+#pragma once
 
 #include <string>
-#include <stdio.h>
 #include <vector>
-#include <math.h>
+#include <array>
+#include <memory>
+#include <cmath>
 
 /***********************************************************************************
 
  information about a tracking station
 
 ***********************************************************************************/
-struct stTrackStation
+struct TrackStation
 {
-	double dfLatitude, dfLongitude, dfHeight;	// Geodetic position;
-	double dfSinLat, dfCosLat;					
-	double dfECEFX, dfECEFY, dfECEFZ;			// in meter
+	double latitude, longitude, height;  // Geodetic position;
+	double sinLat, cosLat;                
+	double ecefX, ecefY, ecefZ;           // in meter
 
-	char szName[ _MAX_PATH ];
-	int nSiteNo;
+	std::string name;
+	int siteNo;
 
 	// 1 for Laser 
 	// 2 for Optical
 	// 3 for both
-	int nTrackingFacility;
+	int trackingFacility;
 };
 
 /***********************************************************************************
@@ -46,23 +47,23 @@ struct stTrackStation
  information about status of a tracking station
 
 ***********************************************************************************/
-struct stStationStatus
+struct StationStatus
 {
-	int nStationID;
-	BOOL bAvailable;
-	double dfJDBegin, dfJDEnd;
+	int stationID;
+	bool available;
+	double jdBegin, jdEnd;
 
 	// unavailability code, for example, 
 	// 1 for weather, 
 	// 2 for system problem, 
 	// 3 for maintance, 
 	// etc
-	int nCode;	
+	int code;
 
 	// 1 for Laser 
 	// 2 for Optical
 	// 3 for both
-	int nTrackingFacility;
+	int trackingFacility;
 };
 
 /***********************************************************************************
@@ -71,16 +72,16 @@ struct stStationStatus
 
 ***********************************************************************************/
 
-struct stVisibilityCondition
+struct VisibilityCondition
 {
-	BOOL bSun;				// TRUE if the sun illumination is required
+	bool sun;               // TRUE if the sun illumination is required
 
-	double dfElevationMask;	// in radian
-	double dfZenithMask;	// 90 degree - dfElevationMask
+	double elevationMask;   // in radian
+	double zenithMask;      // 90 degree - elevationMask
 
-	double dfSunElevationMask;	// in radian
+	double sunElevationMask;    // in radian
 
-	double dfSunReflectAngle;	// in radian
+	double sunReflectAngle;     // in radian
 };
 
 
@@ -90,9 +91,9 @@ struct stVisibilityCondition
 
 ***********************************************************************************/
 
-struct stPassPoint
+struct PassPoint
 {
-	double dfJD, dfAz, dfEl;
+	double jd, az, el;
 };
 
 /***********************************************************************************
@@ -100,24 +101,25 @@ struct stPassPoint
  Parameters that defines a satellite pass
 
 ***********************************************************************************/
-struct stVisiblePass
+
+struct VisiblePass
 {
-	int nSatID;
-	int nStationID;
+	int satID;
+	int stationID;
 
 	// 1 for Laser 
 	// 2 for Optical
 	// 3 for both
-	int nTrackingFacility;
+	int trackingFacility;
 
-	stPassPoint tRise, tSet, tTCA;
+	PassPoint rise, set, tca;
 
 	// sun lit data
-	BOOL bSunLit;
+	bool sunLit;
 
-	stPassPoint tSunLitRise, tSunLitSet, tSunLitMid;
+	PassPoint sunLitRise, sunLitSet, sunLitMid;
 
-	double dfBenifit;
+	double benefit;
 };
 
 
@@ -127,23 +129,14 @@ struct stVisiblePass
 
 ***********************************************************************************/
 
-struct stDarkTime
+struct DarkTime
 {
-	int nStationID;
-	int nNumberDarkPeriod;
-	double *pdfBeginJD, *pdfEndJD;
+	int stationID;
+	int numberDarkPeriod;
+	std::vector<double> beginJD;
+	std::vector<double> endJD;
 
-	stDarkTime()
-	{
-		pdfBeginJD = new double[ 500 ];
-		pdfEndJD = new double[ 500 ];
-	}
-
-	~stDarkTime()
-	{
-		delete []pdfBeginJD;
-		delete []pdfEndJD;
-	}
+	DarkTime() : beginJD(500), endJD(500) {}
 };
 
 /***********************************************************************************
@@ -152,35 +145,35 @@ struct stDarkTime
 
 ***********************************************************************************/
 
-struct stVisComControl
+struct VisComControl
 {
-	BOOL bInit;
+	bool init;
 
-	char szStationDataFile[ _MAX_PATH ];
-	char szSatelliteDataFile[ _MAX_PATH ];
+	std::string stationDataFile;
+	std::string satelliteDataFile;
 
 	// start date/time and prediction period of time
-	int nYear, nMonth, nDay, nHour;	// in UTC
-	double dfPredictionDays;
-	double dfJDBegin;	// from Year/Month/Day/Hour	in UTC
-	double dfJDEnd;		// dfJDBegin + dfPredictionDas	in UTC
+	int year, month, day, hour;  // in UTC
+	double predictionDays;
+	double jdBegin;  // from Year/Month/Day/Hour    in UTC
+	double jdEnd;    // jdBegin + predictionDays    in UTC
 	
 	// gravity model
-	char szGravityFile[ _MAX_PATH ];
-	char szGravityModel[ _MAX_PATH ];
-	int nMaxGravityDegree;
+	std::string gravityFile;
+	std::string gravityModel;
+	int maxGravityDegree;
 
 	// Initial Orbital Elements (IOE)
-	int nIOEType;	// 1 for IRV, 2 for TLE, 3 for EOSMOE
-	char szIOEFile[ _MAX_PATH ];
+	int ioeType;  // 1 for IRV, 2 for TLE, 3 for EOSMOE
+	std::string ioeFile;
 
-	char szCatalogFile[ _MAX_PATH ];
+	std::string catalogFile;
 
 	// visibility condition
-	stVisibilityCondition stVisibility;
+	VisibilityCondition visibility;
 };
 
-extern stVisComControl g_stControlFile;
+extern VisComControl g_controlFile;
 
 /***********************************************************************************
 
@@ -223,206 +216,192 @@ struct stSatelliteIOE
 
 ***********************************************************************************/
 
-struct stSatelliteIOE
+struct SatelliteIOE
 {
-	int nSatelliteID;
-	int nSIC;
-	char cElementType;			// T for TLE, E for EOS, I for IRV
-	int nIntJD, nFractionJD;
+	int satelliteID;
+	int sic;
+	char elementType;        // T for TLE, E for EOS, I for IRV
+	int intJD, fractionJD;
 
-	int pnElement1to6[ 6 ];
-	float pfElement7to18[ 20 ];
-	bool bNewElement;
-	double dfTimeLastTracked;
-	bool bTrackingtarget;
-	bool bAcquired;
-	bool bTrackable;
-	bool bTrackingTested;
-	bool bSecondTrack;
+	std::array<int, 6> element1to6;
+	std::array<float, 20> element7to18;
+	bool newElement;
+	double timeLastTracked;
+	bool trackingTarget;
+	bool acquired;
+	bool trackable;
+	bool trackingTested;
+	bool secondTrack;
 
-	bool bLEO;
-	bool bNORAD;
+	bool leo;
+	bool norad;
 
-	double Diameter;//m 20180509
+	double diameter; //m 20180509
 
-	std::vector< std::string > trackbenefit;
+	std::vector<std::string> trackBenefit;
 
-    void Assign( const stSatelliteIOE stSource, stSatelliteIOE &stResult ) const 
+    void assign(const SatelliteIOE& source, SatelliteIOE& result) const 
 	{
-		stResult.cElementType = stSource.cElementType;
-		stResult.nFractionJD = stSource.nFractionJD;
-		stResult.nIntJD = stSource.nIntJD;
-		stResult.nSatelliteID = stSource.nSatelliteID;
-		stResult.nSIC = stSource.nSIC;
-		stResult.bNewElement = stSource.bNewElement;
-		stResult.dfTimeLastTracked = stSource.dfTimeLastTracked;
-		stResult.bTrackingtarget = stSource.bTrackingtarget;
-		stResult.bAcquired = stSource.bAcquired;
-		stResult.bTrackable = stSource.bTrackable;
-		stResult.bTrackingTested = stSource.bTrackingTested;
-		stResult.bSecondTrack = stSource.bSecondTrack;
+		result.elementType = source.elementType;
+		result.fractionJD = source.fractionJD;
+		result.intJD = source.intJD;
+		result.satelliteID = source.satelliteID;
+		result.sic = source.sic;
+		result.newElement = source.newElement;
+		result.timeLastTracked = source.timeLastTracked;
+		result.trackingTarget = source.trackingTarget;
+		result.acquired = source.acquired;
+		result.trackable = source.trackable;
+		result.trackingTested = source.trackingTested;
+		result.secondTrack = source.secondTrack;
 
-		for( int i = 0; i < 6; i++ ) stResult.pnElement1to6[ i ] = stSource.pnElement1to6[ i ];
-		for( int i = 0; i < 20; i++ ) stResult.pfElement7to18[ i ] = stSource.pfElement7to18[ i ];
-		stResult.trackbenefit.clear( );
-		stResult.trackbenefit.reserve( stSource.trackbenefit.size( ) );
-		for( int i2 = 0; i2 < (int)stSource.trackbenefit.size( ); i2++ ) 
+		result.element1to6 = source.element1to6;
+		result.element7to18 = source.element7to18;
+		result.trackBenefit.clear();
+		result.trackBenefit.reserve(source.trackBenefit.size());
+		for (const auto& benefit : source.trackBenefit)
 		{
-			stResult.trackbenefit.push_back( stSource.trackbenefit[i2] );
+			result.trackBenefit.push_back(benefit);
 		}
 	}
 		
-	double GetRefJD( ) const 
+	double getRefJD() const 
 	{ 
-		return ( (double)nIntJD + (double)nFractionJD * 1.0e-9 ); 
-	};
-
-	double GetBStar()
-	{
-		return pfElement7to18[ 2 ];
+		return static_cast<double>(intJD) + static_cast<double>(fractionJD) * 1.0e-9; 
 	}
 
-	double Get_nDot()
+	double getBStar() const
 	{
-		return pfElement7to18[ 0 ];
+		return element7to18[2];
 	}
 
-	double GetTimeLastTracked( ) const 
+	double getNDot() const
+	{
+		return element7to18[0];
+	}
+
+	double getTimeLastTracked() const 
 	{ 
 		// may need to scope lock, just incase the data changes
-		if( dfTimeLastTracked < 0 )
+		if (timeLastTracked < 0)
 		{
-			return GetRefJD( ); 
+			return getRefJD(); 
 		}
 		else
 		{
-			return dfTimeLastTracked;
+			return timeLastTracked;
 		}
-	};
-	void SetTimeLastTracked( double dfTime )
-	{
-		dfTimeLastTracked = dfTime;
 	}
-	void SetRefJD( double dfJD ) 
+	void setTimeLastTracked(double time)
 	{
-		nIntJD = (int) dfJD;
-		nFractionJD = (int) ( ( dfJD - nIntJD ) * 1.0e9 );
+		timeLastTracked = time;
+	}
+	void setRefJD(double jd) 
+	{
+		intJD = static_cast<int>(jd);
+		fractionJD = static_cast<int>((jd - intJD) * 1.0e9);
 	}
 
-	void GetPosVel( double *pdfPos, double *pdfVel ) const 
+	void getPosVel(double* pos, double* vel) const 
 	{
-		for( int i = 0; i < 3; i++ )
+		for (int i = 0; i < 3; i++)
 		{
-			pdfPos[ i ] = (double)pnElement1to6[ i ] * 1.e-1;
-			pdfVel[ i ] = (double)pnElement1to6[ i + 3 ] * 1.0e-4;
+			pos[i] = static_cast<double>(element1to6[i]) * 1.e-1;
+			vel[i] = static_cast<double>(element1to6[i + 3]) * 1.0e-4;
 		}
 	}
 
-	double GetOrbitalPeriod( ) const 
+	double getOrbitalPeriod() const 
 	{ 
-		return (double)pfElement7to18[ 11 ]; 
-	};
+		return static_cast<double>(element7to18[11]); 
+	}
 
-	double GetInclination() { return (double) pnElement1to6[ 2 ] * 1.0e-5; };
-	double GetEccentricity() { return (double) pnElement1to6[ 1 ] * 1.0e-7; };
-	double GetRANode() { return (double) pnElement1to6[ 3 ] * 1.0e-5; };
-	double GetPerigeeAugument() { return (double) pnElement1to6[ 4 ] * 1.0e-5; };
-	double GetMeanAmoaly() { return (double) pnElement1to6[ 5 ] * 1.0e-5; };
+	double getInclination() const { return static_cast<double>(element1to6[2]) * 1.0e-5; }
+	double getEccentricity() const { return static_cast<double>(element1to6[1]) * 1.0e-7; }
+	double getRANode() const { return static_cast<double>(element1to6[3]) * 1.0e-5; }
+	double getPerigeeAugment() const { return static_cast<double>(element1to6[4]) * 1.0e-5; }
+	double getMeanAnomaly() const { return static_cast<double>(element1to6[5]) * 1.0e-5; }
 
 	// added by RO december 2004 to store the contents of each line of the TLE
-	std::string Line1, Line2, Line3;
+	std::string line1, line2, line3;
 	
-	stSatelliteIOE& operator=( const stSatelliteIOE &RHS ) 
+	SatelliteIOE& operator=(const SatelliteIOE& rhs) 
 	{
-		if( this == &RHS ) return *this;
-		Assign( RHS );
+		if (this == &rhs) return *this;
+		assign(rhs, *this);
 		return *this;
-	};
+	}
 
-	void Assign( const stSatelliteIOE &RHS )
+	void assign(const SatelliteIOE& rhs)
 	{
-		nSatelliteID = RHS.nSatelliteID;
-		nSIC = RHS.nSIC;
-		cElementType = RHS.cElementType;			// T for TLE, E for EOS, I for IRV
-		nIntJD = RHS.nIntJD;
-		nFractionJD = RHS.nFractionJD;
-		bNewElement = RHS.bNewElement;
-		dfTimeLastTracked = RHS.dfTimeLastTracked;
-		bTrackingtarget = RHS.bTrackingtarget;
-		bAcquired = RHS.bAcquired;
-		bTrackable = RHS.bTrackable;
-		bTrackingTested = RHS.bTrackingTested;
-		bSecondTrack = RHS.bSecondTrack;
+		satelliteID = rhs.satelliteID;
+		sic = rhs.sic;
+		elementType = rhs.elementType;        // T for TLE, E for EOS, I for IRV
+		intJD = rhs.intJD;
+		fractionJD = rhs.fractionJD;
+		newElement = rhs.newElement;
+		timeLastTracked = rhs.timeLastTracked;
+		trackingTarget = rhs.trackingTarget;
+		acquired = rhs.acquired;
+		trackable = rhs.trackable;
+		trackingTested = rhs.trackingTested;
+		secondTrack = rhs.secondTrack;
 
-        int i;
-		for( i = 0; i < 6; i++ )
-		{
-			pnElement1to6[i] = RHS.pnElement1to6[i];
-		}
-		for( i = 0; i < 12; i++ )
-		{
-			pfElement7to18[i] = RHS.pfElement7to18[i];
-		}
-		Line1 = RHS.Line1;
-		Line2 = RHS.Line2;
-		Line3 = RHS.Line3;
+		element1to6 = rhs.element1to6;
+		element7to18 = rhs.element7to18;
+		line1 = rhs.line1;
+		line2 = rhs.line2;
+		line3 = rhs.line3;
 		
-		trackbenefit.clear( );
-		trackbenefit.reserve( RHS.trackbenefit.size( ) );
-		for( int i2 = 0; i2 < (int)RHS.trackbenefit.size( ); i2++ ) 
+		trackBenefit.clear();
+		trackBenefit.reserve(rhs.trackBenefit.size());
+		for (const auto& benefit : rhs.trackBenefit)
 		{
-			trackbenefit.push_back( RHS.trackbenefit[i2] );
+			trackBenefit.push_back(benefit);
 		}
-
-	}
-	stSatelliteIOE( const stSatelliteIOE &RHS )
-	{
-		Assign( RHS );
-	}
-	stSatelliteIOE( )
-	{
-		nSatelliteID = 0;
-		nSIC = 0;
-		cElementType = 'T';			// T for TLE, E for EOS, I for IRV
-		nIntJD = 0;
-		nFractionJD = 0;
-        int i;
-		for( i = 0; i < 6; i++ )
-		{
-			pnElement1to6[i] = 0;
-		}
-		for( i = 0; i < 12; i++ )
-		{
-			pfElement7to18[i] = 0;
-		}
-		Line1 = "";
-		Line2 = "";
-		Line3 = "";
-		bNewElement = true;
-		dfTimeLastTracked = -10;
-		bTrackingtarget = false;
-		trackbenefit.clear( );
-		trackbenefit.reserve( 1000 );
-		bAcquired = false;
-		bTrackable = false;
-		bTrackingTested = false;
-		bSecondTrack = false;
 	}
 
-	double GetSemiMajor()
+	SatelliteIOE(const SatelliteIOE& rhs)
 	{
-		double dfn = 2 * 3.1415926 * pnElement1to6[0] * 1e-8 / 86400.0;
-		return pow( 3.986004418e14/( dfn*dfn ), 1.0/3.0 );
+		assign(rhs);
 	}
 
-	double GetPerigeeHeight()	// in m
+	SatelliteIOE() : 
+		satelliteID(0),
+		sic(0),
+		elementType('T'),        // T for TLE, E for EOS, I for IRV
+		intJD(0),
+		fractionJD(0),
+		element1to6{0}, 
+		element7to18{0}, 
+		newElement(true),
+		timeLastTracked(-10),
+		trackingTarget(false),
+		acquired(false),
+		trackable(false),
+		trackingTested(false),
+		secondTrack(false),
+		leo(false),
+		norad(false),
+		diameter(0.0)
 	{
-		return ( GetSemiMajor() * ( 1.0 - GetEccentricity() ) );
+		trackBenefit.reserve(1000);
 	}
 
-	double GetAltitudeKM( )
+	double getSemiMajor() const
 	{
-		return ( GetSemiMajor() - 6378137.0 ) / 1000.0 ;
+		double n = 2 * 3.1415926 * element1to6[0] * 1e-8 / 86400.0;
+		return pow(3.986004418e14 / (n * n), 1.0 / 3.0);
+	}
+
+	double getPerigeeHeight() const // in m
+	{
+		return getSemiMajor() * (1.0 - getEccentricity());
+	}
+
+	double getAltitudeKM() const
+	{
+		return (getSemiMajor() - 6378137.0) / 1000.0;
 	}
 
 };
@@ -435,11 +414,12 @@ struct stSatelliteIOE
   time. With the time going on, the reference time is pushed forward.
 
 *********************************************************************************/
-struct stInternalIRV
+struct InternalIRV
 {
-	int nSatelliteID;
-	double dfRefJD;
-	double pdfPos[ 3 ], pdfVel[ 3 ];
+	int satelliteID;
+	double refJD;
+	std::array<double, 3> pos;
+	std::array<double, 3> vel;
 };
 
 /********************************************************************************
@@ -448,21 +428,21 @@ struct stInternalIRV
 
 *********************************************************************************/
 
-struct stElementConversionControl
+struct ElementConversionControl
 {
-	char nSourceType;	// 1 for IRV, 2 for TLE, 3 for EOSMOE
-	char szSourceFile[ _MAX_PATH ];
+	char sourceType;    // 1 for IRV, 2 for TLE, 3 for EOSMOE
+	std::string sourceFile;
 
-	char nResultType;
-	char szResultFile[ _MAX_PATH ];
+	char resultType;
+	std::string resultFile;
 
 	// reference epoch
-	int nYear, nMonth, nDay, nHour;	// in UTC
-	double dfJD;	// from Year/Month/Day/Hour	in UTC
+	int year, month, day, hour;  // in UTC
+	double jd;  // from Year/Month/Day/Hour    in UTC
 
 };
 
-extern stElementConversionControl g_stElementConversionControl;
+extern ElementConversionControl g_elementConversionControl;
 
 /********************************************************************************
 
@@ -470,12 +450,12 @@ extern stElementConversionControl g_stElementConversionControl;
 
 *********************************************************************************/
 
-struct stCatalogStar
+struct CatalogStar
 {
-	int nNoCatalogue;
-	char cSource;		// F for FK5, ...
-	double dfMagnitude;
-	double dfRA, dfDEC, dfPara, dfPMRA, dfPMDEC, dfRV;
+	int catalogNumber;
+	char source;        // F for FK5, ...
+	double magnitude;
+	double ra, dec, para, pmRA, pmDEC, rv;
 };
 
 /********************************************************************************
@@ -484,13 +464,12 @@ struct stCatalogStar
 
 *********************************************************************************/
 
-struct stImageObject
+struct ImageObject
 {
-	int nNo;
-	double dfX, dfY;	// origin is in the centre of the image
-	double dfIntensity;
+	int number;
+	double x, y;        // origin is in the centre of the image
+	double intensity;
 };
 
 
 
-#endif

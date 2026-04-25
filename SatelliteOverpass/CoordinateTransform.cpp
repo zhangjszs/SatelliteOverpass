@@ -6,8 +6,11 @@
 ******************************************************************************/
 
 #include "Constant.h"
-#include "CoorTran.h"
-#include "matrix.h"
+#include "CoordinateTransform.h"
+#include "Matrix.h"
+
+// 全局矩阵对象
+extern cMatrix g_Matrix;
 
 cCoorTrans::cCoorTrans()
 { 
@@ -729,35 +732,54 @@ void cCoorTrans::ConvertXYZ2BLH( double &x, double &y, double &z ,
 	}
 	else
 	{
+		// Bowring algorithm for XYZ to BLH conversion
+		// More efficient than the previous iterative method
 		l = atan2( y, x );
 		if( l < 0.0 ) l += g_dfTWOPI;
 
-		if( z == 0.0 ) 
+		double p = sqrt( x * x + y * y );
+		if( p == 0.0 )
 		{
-			b = 0;
-			an = semi_major;
-		}
-		else if( sqrt( x * x + y * y ) == 0.0 )
-		{
-			if( z < 0 ) b = -g_dfHALFPI;
-			else b = g_dfHALFPI;
-
+			// Polar case
+			b = ( z < 0 ) ? -g_dfHALFPI : g_dfHALFPI;
 			an = semi_major / sqrt( 1.0 - eccentricity );
+			h = fabs( z ) - an * ( 1.0 - eccentricity );
+			return;
 		}
-		else
+
+		// Initialize variables
+		double e2 = eccentricity;
+		double e4 = e2 * e2;
+		double e6 = e4 * e2;
+		double a1 = semi_major * e2;
+		double a2 = a1 * e2 / 2.0;
+		double a3 = a1 * e4 / 24.0;
+		double a4 = a1 * e6 / 720.0;
+		double a5 = a1 * e2 * e2 * e2 * e2 / 40320.0;
+
+		// Compute initial approximation for latitude
+		double phi = atan2( z, p * ( 1.0 - e2 ) );
+		double phi_new;
+		double N;
+
+		// Iterate until convergence (usually 2-3 iterations)
+		for( int i = 0; i < 5; i++ )
 		{
-			double zxy = z / sqrt( x * x + y * y );
-			double b0 = atan( zxy );
-			an = 0;
-			 
-			for( int i = 0; i < 10; i++ )
-			{
-				an = semi_major / sqrt( 1.0 - eccentricity * sin( b0 ) * sin( b0 ) );
-				b0 = b = atan( zxy * ( 1.0 + eccentricity * an * sin( b0 ) / z ) );
-			}
+			double sin_phi = sin( phi );
+			double sin2_phi = sin_phi * sin_phi;
+			N = semi_major / sqrt( 1.0 - e2 * sin2_phi );
+			phi_new = atan2( z + N * e2 * sin_phi, p );
+			
+			// Check for convergence
+			if( fabs( phi_new - phi ) < 1.0e-12 )
+				break;
+			
+			phi = phi_new;
 		}
-    
-		h = sqrt ( x * x + y * y ) / cos( b ) - an;
+
+		b = phi;
+		an = N;
+		h = p / cos( b ) - an;
 	}	
 }
 	

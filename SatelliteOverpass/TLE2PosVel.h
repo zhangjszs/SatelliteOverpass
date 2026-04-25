@@ -14,7 +14,7 @@
 ***************************************************************************/
 #pragma once
 
-#include <windows.h>
+// #include <windows.h> // Removed for cross-platform compatibility
 #include "DataStructure.h"
 
 #include <string>
@@ -138,7 +138,7 @@ public:
 
 	bool ReadTLE( int nNORADID, char *szFileName );
 
-	bool SetOrbitalElements( stSatelliteIOE stIOE );
+	bool SetOrbitalElements( SatelliteIOE stIOE );
 	bool SetOrbitalElements( double *pdfTLE );
 	bool GetOrbitalElements( double *pdfTLE );
 
@@ -155,9 +155,9 @@ public:
 
 	void GetTLE( double *pdfTLE );
 
-	bool ReadAllTLE( std::vector<stSatelliteIOE> &TLEData, const char *szFileName, bool bPerigeeTest = false,
+	bool ReadAllTLE( std::vector<SatelliteIOE> &TLEData, const char *szFileName, bool bPerigeeTest = false,
 		             double perigeeLimit = 6378137.0 + 250000.0, double apogeeLimit = 6378137.0 + 5000000.0 );
-	bool ReadAllTLE( std::vector<stSatelliteIOE> &TLEData, const char *szFileName, int numberID, int*NORADID );
+	bool ReadAllTLE( std::vector<SatelliteIOE> &TLEData, const char *szFileName, int numberID, int*NORADID );
 
 private:
 
@@ -174,8 +174,8 @@ private:
 								  double &dfPerigeeP, double &dfMAP );
 	bool FromInertialToEFEC( double dfJD, double *pdfPos, double *pdfVel );
 
-	bool ReadTLELine1( string line, struct stSatelliteIOE &stIOE );
-	bool ReadTLELine2( string line, struct stSatelliteIOE &stIOE );
+	bool ReadTLELine1( string line, struct SatelliteIOE &stIOE );
+	bool ReadTLELine2( string line, struct SatelliteIOE &stIOE );
 
 	bool CheckSum( string line );
 
@@ -184,6 +184,6 @@ private:
 
 	double GetAltitudeKM( const double pos[3] );
 
-	void PerturbElement( stSatelliteIOE &tIOE, int nsatID );
+	void PerturbElement( SatelliteIOE &tIOE, int nsatID );
 
 };

@@ -41,11 +41,11 @@ cCholeskyDecom::~cCholeskyDecom()
 
 ***************************************************************************************/
 
-BOOL cCholeskyDecom::Decompose( double *pdfMatrix, int nDim )
+bool cCholeskyDecom::Decompose( double *pdfMatrix, int nDim )
 {
 	if( !pdfMatrix )
 	{
-		return FALSE;
+		return false;
 	}
 
 	try
@@ -87,7 +87,7 @@ BOOL cCholeskyDecom::Decompose( double *pdfMatrix, int nDim )
 				{
 					if( sum <= 0.0 )
 					{
-						return FALSE;
+						return false;
 					}
 
 					v_cholesky[ ii ] = sqrt( sum );
@@ -102,19 +102,19 @@ BOOL cCholeskyDecom::Decompose( double *pdfMatrix, int nDim )
 		k = nDim * ( nDim + 1 ) / 2;
 		for( i = 0; i < k; i++ ) pdfMatrix[ i ] = v_cholesky[ i ];
 
-		return TRUE;
+		return true;
 	}
 	catch( ... )
 	{
-		return FALSE;
+		return false;
 	}
 }
 
-BOOL cCholeskyDecom::Decompose( double *pdfMatrix, int nDim, int nDim0 )
+bool cCholeskyDecom::Decompose( double *pdfMatrix, int nDim, int nDim0 )
 {
 	if( !pdfMatrix )
 	{
-		return FALSE;
+		return false;
 	}
 
 	try
@@ -125,7 +125,7 @@ BOOL cCholeskyDecom::Decompose( double *pdfMatrix, int nDim, int nDim0 )
 		double *v = new double[ nDim0 ];
 		if( !v ) 
 		{
-			return FALSE;
+			return false;
 		}
 
 		for( i = 0; i < nDim0; i++ )  v[ i ] = 0.0;
@@ -155,7 +155,7 @@ BOOL cCholeskyDecom::Decompose( double *pdfMatrix, int nDim, int nDim0 )
 					if( sum <= 0.0 )
 					{
 						delete []v;
-						return FALSE;
+						return false;
 					}
 
 					v[ ii ] = sqrt( sum );
@@ -170,11 +170,11 @@ BOOL cCholeskyDecom::Decompose( double *pdfMatrix, int nDim, int nDim0 )
 		for( i = 0; i < nDim0; i++ ) pdfMatrix[ i ] = v[ i ];
 
 		delete []v;
-		return TRUE;
+		return true;
 	}
 	catch( ... )
 	{
-		return FALSE;
+		return false;
 	}
 }
 
@@ -196,17 +196,17 @@ BOOL cCholeskyDecom::Decompose( double *pdfMatrix, int nDim, int nDim0 )
 
 ***************************************************************************************/
 
-BOOL cCholeskyDecom::LinearEquation( double *pdfMatrix, double *pdfB, 
+bool cCholeskyDecom::LinearEquation( double *pdfMatrix, double *pdfB, 
 									 int nDim, double *pdfX )
 {
 	if( !pdfMatrix || !pdfB || !pdfX )
 	{
-		return FALSE;
+		return false;
 	}
 
 	if( !Decompose( pdfMatrix, nDim, nDim * ( nDim + 1 ) / 2 ) ) 
 	{
-		return FALSE;
+		return false;
 	}
 
 	try
@@ -247,11 +247,11 @@ BOOL cCholeskyDecom::LinearEquation( double *pdfMatrix, double *pdfB,
 			pdfX[ i ] = sum / pdfMatrix[ ii ];
 		}
 
-		return TRUE;
+		return true;
 	}
 	catch( ... )
 	{
-		return FALSE;
+		return false;
 	}
 }
 
@@ -277,11 +277,11 @@ BOOL cCholeskyDecom::LinearEquation( double *pdfMatrix, double *pdfB,
 
 ***************************************************************************************/
 
-BOOL cCholeskyDecom::InverseLowTriangular( double *pdfMatrix, int nDim )
+bool cCholeskyDecom::InverseLowTriangular( double *pdfMatrix, int nDim )
 {
 	if( !pdfMatrix )
 	{
-		return FALSE;
+		return false;
 	}
 
 	try
@@ -295,7 +295,7 @@ BOOL cCholeskyDecom::InverseLowTriangular( double *pdfMatrix, int nDim )
 
 			if( fabs( pdfMatrix[ ii ] ) < 1.0e-50 )
 			{
-				return FALSE;
+				return false;
 			}
 
 			for( j = i + 1; j < nDim; j++ )
@@ -330,11 +330,11 @@ BOOL cCholeskyDecom::InverseLowTriangular( double *pdfMatrix, int nDim )
 			}
 		}
 
-		return TRUE;
+		return true;
 	}
 	catch( ... )
 	{
-		return FALSE;
+		return false;
 	}
 }
 
@@ -360,11 +360,11 @@ BOOL cCholeskyDecom::InverseLowTriangular( double *pdfMatrix, int nDim )
 
 ***************************************************************************************/
 
-BOOL cCholeskyDecom::MatrixInversing( double *pdfMatrix, int nDim, int nCase )
+bool cCholeskyDecom::MatrixInversing( double *pdfMatrix, int nDim, int nCase )
 {
 	if( !pdfMatrix )
 	{
-		return FALSE;
+		return false;
 	}
 
 	switch( nCase )
@@ -372,12 +372,12 @@ BOOL cCholeskyDecom::MatrixInversing( double *pdfMatrix, int nDim, int nCase )
 		case 1:
 			if( !Decompose( pdfMatrix, nDim ) ) 
 			{
-				return FALSE;
+				return false;
 			}
 			
 			if( !InverseLowTriangular( pdfMatrix, nDim ) ) 
 			{
-				return FALSE;
+				return false;
 			}
 			
 			break;
@@ -386,7 +386,7 @@ BOOL cCholeskyDecom::MatrixInversing( double *pdfMatrix, int nDim, int nCase )
 			
 			if( !InverseLowTriangular( pdfMatrix, nDim ) ) 
 			{
-				return FALSE;
+				return false;
 			}
 			
 			break;
@@ -431,20 +431,20 @@ BOOL cCholeskyDecom::MatrixInversing( double *pdfMatrix, int nDim, int nCase )
 
 		for( i = 0; i < k; i++ ) pdfMatrix[ i ] = v_temp[ i ];
 
-		return TRUE;
+		return true;
 	}
 	catch( ... )
 	{
-		return FALSE;
+		return false;
 	}
 }
 
 
-BOOL cCholeskyDecom::MatrixInversing( double *pdfMatrix, int nDim, int nDim0, int nCase )
+bool cCholeskyDecom::MatrixInversing( double *pdfMatrix, int nDim, int nDim0, int nCase )
 {
 	if( !pdfMatrix )
 	{
-		return FALSE;
+		return false;
 	}
 
 	switch( nCase )
@@ -452,12 +452,12 @@ BOOL cCholeskyDecom::MatrixInversing( double *pdfMatrix, int nDim, int nDim0, in
 		case 1:
 			if( !Decompose( pdfMatrix, nDim, nDim0 ) ) 
 			{
-				return FALSE;
+				return false;
 			}
 			
 			if( !InverseLowTriangular( pdfMatrix, nDim ) ) 
 			{
-				return FALSE;
+				return false;
 			}
 			
 			break;
@@ -466,7 +466,7 @@ BOOL cCholeskyDecom::MatrixInversing( double *pdfMatrix, int nDim, int nDim0, in
 			
 			if( !InverseLowTriangular( pdfMatrix, nDim ) ) 
 			{
-				return FALSE;
+				return false;
 			}
 			
 			break;
@@ -481,7 +481,7 @@ BOOL cCholeskyDecom::MatrixInversing( double *pdfMatrix, int nDim, int nDim0, in
 		double *v = new double[ nDim0 ];
 		if( !v ) 
 		{
-			return FALSE;
+			return false;
 		}
 
 		for( i = 0; i < nDim0; i++ ) v[ i ] = 0.0;
@@ -508,10 +508,10 @@ BOOL cCholeskyDecom::MatrixInversing( double *pdfMatrix, int nDim, int nDim0, in
 
 		delete []v;
 
-		return TRUE;
+		return true;
 	}
 	catch( ... )
 	{
-		return FALSE;
+		return false;
 	}
 }

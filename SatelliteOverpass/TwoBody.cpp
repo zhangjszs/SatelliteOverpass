@@ -10,14 +10,14 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "twobody.h"
-#include "coortran.h"
+#include "TwoBody.h"
+#include "CoordinateTransform.h"
 #include "GreenwichSiderealTime.h"
-#include "constant.h"
+#include "ModernConstants.h"
 
 cTwoBody::cTwoBody()
 {
-	m_dfTransCoe = ( g_dfEarthSemiMajor * dfEarthGMIOD ) / 60.0;
+	m_dfTransCoe = ( g_Constants::EARTH_SEMI_MAJOR * dfEarthGMIOD ) / 60.0;
 }
 
 
@@ -41,7 +41,7 @@ void cTwoBody::SetElement( TwoBodyOrbitElement &stSatellite )
 
 	double t = m_stSatellite.referencetime_jd_int + m_stSatellite.referencetime_jd_fra;
 
-	if( fabs( m_stSatellite.referencetime_jd - g_dfJ2000 ) > 500.0 * 365.0 )
+	if( fabs( m_stSatellite.referencetime_jd - g_Constants::J2000 ) > 500.0 * 365.0 )
 	{
 		m_stSatellite.referencetime_jd = t;
 	}
@@ -68,7 +68,7 @@ void cTwoBody::ComputeInertialXYZ( double dfTimeJD )
 		double dfMM, dfDeltaT;
 
 		if( m_stSatellite.GM == 1 ) 
-			dfMM = sqrt( g_dfEarthGM / pow( m_stSatellite.semi_major, 3.0 ) );
+			dfMM = sqrt( g_Constants::EARTH_GM / pow( m_stSatellite.semi_major, 3.0 ) );
 		else dfMM = sqrt( dfMuIOD / m_stSatellite.semi_major ) / 
 			        m_stSatellite.semi_major;	 		
 
@@ -134,7 +134,7 @@ void cTwoBody::ComputeInertialXYZ( double dfIntJD, double dfFraJD )
 		double dfMM, dfDeltaT;
 
 		if( m_stSatellite.GM == 1 ) 
-			dfMM = sqrt( g_dfEarthGM / pow( m_stSatellite.semi_major, 3.0 ) );
+			dfMM = sqrt( g_Constants::EARTH_GM / pow( m_stSatellite.semi_major, 3.0 ) );
 		else dfMM = sqrt( dfMuIOD / m_stSatellite.semi_major ) / 
 			        m_stSatellite.semi_major;	 		
 
@@ -207,11 +207,11 @@ void cTwoBody::TransformInertialToECEF( double dfTimeJD )
 	{
 		if( m_stSatellite.GM != 1 )
 		{
-			m_stSatellite.semi_major = m_stSatellite.semi_major * g_dfEarthSemiMajor;
+			m_stSatellite.semi_major = m_stSatellite.semi_major * g_Constants::EARTH_SEMI_MAJOR;
 
-			m_dfX *= g_dfEarthSemiMajor;
-			m_dfY *= g_dfEarthSemiMajor;
-			m_dfZ *= g_dfEarthSemiMajor;
+			m_dfX *= g_Constants::EARTH_SEMI_MAJOR;
+			m_dfY *= g_Constants::EARTH_SEMI_MAJOR;
+			m_dfZ *= g_Constants::EARTH_SEMI_MAJOR;
 
 			m_dfXdot *= m_dfTransCoe;
 			m_dfYdot *= m_dfTransCoe;
@@ -226,14 +226,14 @@ void cTwoBody::TransformInertialToECEF( double dfTimeJD )
 
 		CoorTrans.RotatingAroundZAxis( ra, m_dfXdot, m_dfYdot, m_dfZdot );	
 
-		m_dfXdot = m_dfXdot + g_dfEarthAngVelocity * m_dfY;
-		m_dfYdot = m_dfYdot - g_dfEarthAngVelocity * m_dfX;			// XYZdot now in ECEF
+		m_dfXdot = m_dfXdot + g_Constants::EARTH_ANGULAR_VELOCITY * m_dfY;
+		m_dfYdot = m_dfYdot - g_Constants::EARTH_ANGULAR_VELOCITY * m_dfX;			// XYZdot now in ECEF
 
 		if( m_stSatellite.GM != 1 )
 		{
-			m_dfX /= g_dfEarthSemiMajor;
-			m_dfY /= g_dfEarthSemiMajor;
-			m_dfZ /= g_dfEarthSemiMajor;
+			m_dfX /= g_Constants::EARTH_SEMI_MAJOR;
+			m_dfY /= g_Constants::EARTH_SEMI_MAJOR;
+			m_dfZ /= g_Constants::EARTH_SEMI_MAJOR;
 
 			m_dfXdot /= m_dfTransCoe; 
 			m_dfYdot /= m_dfTransCoe;
@@ -257,9 +257,9 @@ void cTwoBody::GetXYZ( double &dfX, double &dfY, double &dfZ )
 
 	if( m_stSatellite.GM != 1 )
 	{
-		dfX = m_dfX * g_dfEarthSemiMajor;   
-		dfY = m_dfY * g_dfEarthSemiMajor;   
-		dfZ = m_dfZ * g_dfEarthSemiMajor;
+		dfX = m_dfX * g_Constants::EARTH_SEMI_MAJOR;   
+		dfY = m_dfY * g_Constants::EARTH_SEMI_MAJOR;   
+		dfZ = m_dfZ * g_Constants::EARTH_SEMI_MAJOR;
 	}
 }
 
@@ -271,9 +271,9 @@ void cTwoBody::GetXYZ( double *pdfPos )
 	
 	if( m_stSatellite.GM != 1 )
 	{
-		pdfPos[ 0 ] = m_dfX * g_dfEarthSemiMajor;   
-		pdfPos[ 1 ] = m_dfY * g_dfEarthSemiMajor;   
-		pdfPos[ 2 ] = m_dfZ * g_dfEarthSemiMajor;
+		pdfPos[ 0 ] = m_dfX * g_Constants::EARTH_SEMI_MAJOR;   
+		pdfPos[ 1 ] = m_dfY * g_Constants::EARTH_SEMI_MAJOR;   
+		pdfPos[ 2 ] = m_dfZ * g_Constants::EARTH_SEMI_MAJOR;
 	}
 }
 
@@ -311,13 +311,13 @@ double cTwoBody::GetSemiMajor()		// in meter
 {
 	if( m_stSatellite.GM == 1 )	return m_stSatellite.semi_major;			// in meter	
 	else 
-		return ( m_stSatellite.semi_major * g_dfEarthSemiMajor );			// in meters
+		return ( m_stSatellite.semi_major * g_Constants::EARTH_SEMI_MAJOR );			// in meters
 }
 
 
 double cTwoBody::GetInclination()		// in degree
 {
-	return m_stSatellite.inclination * g_dfRAD2DEG;	// in degrees
+	return m_stSatellite.inclination * g_Constants::RAD2DEG;	// in degrees
 }
 
 
@@ -389,9 +389,9 @@ void cTwoBody::ComputeElementFromPosVel()
 	{
 		if( m_stSatellite.GM == 1 )
 		{
-			m_dfX /= g_dfEarthSemiMajor;
-			m_dfY /= g_dfEarthSemiMajor;
-			m_dfZ /= g_dfEarthSemiMajor;
+			m_dfX /= g_Constants::EARTH_SEMI_MAJOR;
+			m_dfY /= g_Constants::EARTH_SEMI_MAJOR;
+			m_dfZ /= g_Constants::EARTH_SEMI_MAJOR;
 
 			m_dfXdot /= m_dfTransCoe;
 			m_dfYdot /= m_dfTransCoe;
@@ -414,7 +414,7 @@ void cTwoBody::ComputeElementFromPosVel()
 		m_stSatellite.eccentricity = sqrt( ec * ec + es * es );					// (3.161)
 
 		double E0 = atan2( es, ec );
-		if( E0 < 0.0 ) E0 = E0 + g_dfTWOPI;
+		if( E0 < 0.0 ) E0 = E0 + g_Constants::TWO_PI;
 
 		m_stSatellite.MeanAnomaly = E0 - es;									// Kepler equ
 
@@ -440,7 +440,7 @@ void cTwoBody::ComputeElementFromPosVel()
 		double cu = V0[ 2 ] / si;											// (3.200)
 
 		m_stSatellite.Longi_RisingNode = atan2( sl, cl ) - atan2( su, cu );	// (3.199)
-		if( m_stSatellite.Longi_RisingNode < 0.0 ) m_stSatellite.Longi_RisingNode += g_dfTWOPI;
+		if( m_stSatellite.Longi_RisingNode < 0.0 ) m_stSatellite.Longi_RisingNode += g_Constants::TWO_PI;
 
 		double p = m_stSatellite.semi_major * 
 			       ( 1.0 - m_stSatellite.eccentricity * m_stSatellite.eccentricity );	//(3.166)
@@ -448,15 +448,15 @@ void cTwoBody::ComputeElementFromPosVel()
 		double sv = rdot * sqrt( p / dfMuIOD ) / m_stSatellite.eccentricity;			// (3.205)
 		
 		m_stSatellite.perigee = atan2( su, cu ) - atan2( sv, cv );						// (3.206)
-		if( m_stSatellite.perigee < 0.0 ) m_stSatellite.perigee += g_dfTWOPI;
+		if( m_stSatellite.perigee < 0.0 ) m_stSatellite.perigee += g_Constants::TWO_PI;
 
 		if( m_stSatellite.GM == 1 )
 		{
-			m_stSatellite.semi_major *= g_dfEarthSemiMajor;
+			m_stSatellite.semi_major *= g_Constants::EARTH_SEMI_MAJOR;
 
-			m_dfX *= g_dfEarthSemiMajor;
-			m_dfY *= g_dfEarthSemiMajor;
-			m_dfZ *= g_dfEarthSemiMajor;
+			m_dfX *= g_Constants::EARTH_SEMI_MAJOR;
+			m_dfY *= g_Constants::EARTH_SEMI_MAJOR;
+			m_dfZ *= g_Constants::EARTH_SEMI_MAJOR;
 
 			m_dfXdot *= m_dfTransCoe;
 			m_dfYdot *= m_dfTransCoe;
@@ -481,7 +481,7 @@ void cTwoBody::GetElements( double &dfSM, double &dfEcc, double &dfInc,
     dfRAAN  = m_stSatellite.Longi_RisingNode;
     dfMA = m_stSatellite.MeanAnomaly;
 
-	if( m_stSatellite.GM == 0 )	dfSM *= g_dfEarthSemiMajor;
+	if( m_stSatellite.GM == 0 )	dfSM *= g_Constants::EARTH_SEMI_MAJOR;
 }
 
 
@@ -504,9 +504,9 @@ void cTwoBody::GetElements( double &dfSM, double &dfEcc, double &dfInc,
 
 ************************************************************************************************/
 
-BOOL cTwoBody::ComputeElementsFromPosVel( double *pdfPos, double *pdfVel, double dfGM,
+bool cTwoBody::ComputeElementsFromPosVel( double *pdfPos, double *pdfVel, double dfGM,
 		                                  double *pdfElements, 
-									 	  BOOL bPartial, double *pdfPartial )
+									 	  bool bPartial, double *pdfPartial )
 {
 	try
 	{
@@ -534,18 +534,18 @@ BOOL cTwoBody::ComputeElementsFromPosVel( double *pdfPos, double *pdfVel, double
 		double SINI = sqrt( SINI2 );
 		double HSINI = H * SINI;
 		pdfElements[ 2 ] = atan2( SINI, COSI );	// inclination
-		if( pdfElements[ 2 ] < 0.0 ) pdfElements[ 2 ] += g_dfTWOPI;
+		if( pdfElements[ 2 ] < 0.0 ) pdfElements[ 2 ] += g_Constants::TWO_PI;
 
 		pdfElements[ 3 ] = atan2( HX, -HY );
-		if( pdfElements[ 3 ] < 0.0 ) pdfElements[ 3 ] += g_dfTWOPI;	//RA of ascending node
+		if( pdfElements[ 3 ] < 0.0 ) pdfElements[ 3 ] += g_Constants::TWO_PI;	//RA of ascending node
 
 		double SUPROD = -HZ * ( pdfPos[ 0 ] * HX + pdfPos[ 1 ] * HY ) + 
 			            pdfPos[ 2 ] * HSINI2;
 		double CUPROD = H * ( -pdfPos[ 0 ] * HY + pdfPos[ 1 ] * HX );
 		double RESINF = pdfElements[ 0 ] * OME2 * RRDOT / H;
 		double RECOSF = pdfElements[ 0 ] * OME2 - R;
-		double dfTRUE = atan2( RESINF, RECOSF );	// true anomaly
-		if( dfTRUE < 0.0 ) dfTRUE += g_dfTWOPI;
+		double dftrue = atan2( RESINF, RECOSF );	// true anomaly
+		if( dftrue < 0.0 ) dftrue += g_Constants::TWO_PI;
 	      
 		double SURECF = SUPROD * RECOSF;
 		double CURECF = CUPROD * RECOSF;
@@ -554,21 +554,21 @@ BOOL cTwoBody::ComputeElementsFromPosVel( double *pdfPos, double *pdfVel, double
 		double SWPROD = ( SURECF - CURESF );
 		double CWPROD = ( CURECF + SURESF );
 		pdfElements[ 4 ] = atan2( SWPROD, CWPROD );	// argument of perigee
-		if( pdfElements[ 4 ] < 0.0 ) pdfElements[ 4 ] += g_dfTWOPI;
+		if( pdfElements[ 4 ] < 0.0 ) pdfElements[ 4 ] += g_Constants::TWO_PI;
 	      
 		double RTOME2 = sqrt( fabs( OME2 ) );
 		double AESINE = RESINF / RTOME2;
 		double AECOSE = pdfElements[ 0 ] - R;
 
 		double ECC = atan2( AESINE, AECOSE );		// eccentric anomaly
-		if( ECC < 0.0 ) ECC += g_dfTWOPI;
+		if( ECC < 0.0 ) ECC += g_Constants::TWO_PI;
 
 		pdfElements[ 5 ] = ECC - AESINE / pdfElements[ 0 ];	// mean anomaly
-		if( pdfElements[ 5 ] < 0.0 ) pdfElements[ 5 ] += g_dfTWOPI;
-		if( pdfElements[ 5 ] >= g_dfTWOPI ) 
-			pdfElements[ 5 ] = fmod( pdfElements[ 3 ], g_dfTWOPI );
+		if( pdfElements[ 5 ] < 0.0 ) pdfElements[ 5 ] += g_Constants::TWO_PI;
+		if( pdfElements[ 5 ] >= g_Constants::TWO_PI ) 
+			pdfElements[ 5 ] = fmod( pdfElements[ 3 ], g_Constants::TWO_PI );
 
-		if( !bPartial ) return TRUE;
+		if( !bPartial ) return true;
 
 		for( int i = 0; i < 36; i++ ) pdfPartial[ i ] = 0;
 
@@ -694,7 +694,7 @@ BOOL cTwoBody::ComputeElementsFromPosVel( double *pdfPos, double *pdfVel, double
 		for( int i = 0; i < 6; i++ ) element[ i ] = pdfElements[ i ];
 
 		element[ 2 ] += 0.00000001;
-		ComputePosVelFromElements( JD, JD, element, g_dfEarthGM, pos, vel );
+		ComputePosVelFromElements( JD, JD, element, g_Constants::EARTH_GM, pos, vel );
 		int k = 12;
 		for( int i = 0; i < 3; i++ )
 		{
@@ -704,7 +704,7 @@ BOOL cTwoBody::ComputeElementsFromPosVel( double *pdfPos, double *pdfVel, double
 		element[ 2 ] -= 0.00000001;
 
 		element[ 3 ] += 0.00000001;
-		ComputePosVelFromElements( JD, JD, element, g_dfEarthGM, pos, vel );
+		ComputePosVelFromElements( JD, JD, element, g_Constants::EARTH_GM, pos, vel );
 		k = 18;
 		for( int i = 0; i < 3; i++ )
 		{
@@ -713,11 +713,11 @@ BOOL cTwoBody::ComputeElementsFromPosVel( double *pdfPos, double *pdfVel, double
 		}
 		element[ 3 ] -= 0.00000001;
 */
-		return TRUE;
+		return true;
 	}
 	catch( ... )
 	{
-		return FALSE;
+		return false;
 	}
 
 }
@@ -738,7 +738,7 @@ BOOL cTwoBody::ComputeElementsFromPosVel( double *pdfPos, double *pdfVel, double
   
 ************************************************************************************************/
 
-BOOL cTwoBody::ComputePosVelFromElements( double dfJDRef, double dfJD,
+bool cTwoBody::ComputePosVelFromElements( double dfJDRef, double dfJD,
 										  double *pdfElements, double dfGM, 
 		                                  double *pdfPos, double *pdfVel )
 {
@@ -792,11 +792,11 @@ BOOL cTwoBody::ComputePosVelFromElements( double dfJDRef, double dfJD,
 		pdfVel[ 1 ] = xwdot * Py + ywdot * Qy;
 		pdfVel[ 2 ] = xwdot * Pz + ywdot * Qz;
 
-		return TRUE;
+		return true;
 	}
 	catch( ... )
 	{
-		return FALSE;
+		return false;
 	}
 }
 
@@ -813,7 +813,7 @@ BOOL cTwoBody::ComputePosVelFromElements( double dfJDRef, double dfJD,
    
 ************************************************************************************************/
 
-BOOL cTwoBody::MeanAnomaly2TrueAnomaly( double a, double e, double &M, 
+bool cTwoBody::MeanAnomaly2TrueAnomaly( double a, double e, double &M, 
 									    double &f, double &E )
 {
 	try
@@ -831,13 +831,13 @@ BOOL cTwoBody::MeanAnomaly2TrueAnomaly( double a, double e, double &M,
 		double rsinf = a * sqrt( 1.0 - e * e ) * sin( E );		// Eq 2.27
 
 		f = atan2( rsinf, rcosf );
-		if( f < 0.0 ) f += g_dfTWOPI;
+		if( f < 0.0 ) f += g_Constants::TWO_PI;
 
-		return TRUE;
+		return true;
 	}
 	catch( ... )
 	{
-		return FALSE;
+		return false;
 	}
 }
 
@@ -861,12 +861,12 @@ double cTwoBody::ComputeMeanMotion( double a, double dfGM )
   the delta V is expressed as delta xdot and delta ydot in the orbital plane
 
 ******************************************************************************/
-BOOL cTwoBody::deltaVEffect( double dxdot, double dydot, char *fileName )
+bool cTwoBody::deltaVEffect( double dxdot, double dydot, char *fileName )
 {
 	double dfMM, dfDeltaT;
 
 	if( m_stSatellite.GM == 1 ) 
-		dfMM = sqrt( g_dfEarthGM / pow( m_stSatellite.semi_major, 3.0 ) );
+		dfMM = sqrt( g_Constants::EARTH_GM / pow( m_stSatellite.semi_major, 3.0 ) );
 	else dfMM = sqrt( dfMuIOD / m_stSatellite.semi_major ) / 
 			    m_stSatellite.semi_major;	 		
 
@@ -893,15 +893,15 @@ BOOL cTwoBody::deltaVEffect( double dxdot, double dydot, char *fileName )
 
 	FILE *file = NULL;
 	
-	fopen_s( &file, fileName, "w" );
+	file = fopen( fileName, "w" );
 
 	fprintf( file, "before\n" );
 	fprintf( file, "a %20.10f\n", m_stSatellite.semi_major );
 	fprintf( file, "e %20.10f\n", m_stSatellite.eccentricity );
-	fprintf( file, "i %20.10f\n", m_stSatellite.inclination * g_dfRAD2DEG );
-	fprintf( file, "O %20.10f\n", m_stSatellite.Longi_RisingNode * g_dfRAD2DEG );
-	fprintf( file, "w %20.10f\n", m_stSatellite.perigee * g_dfRAD2DEG );
-	fprintf( file, "M %20.10f\n", m_stSatellite.MeanAnomaly * g_dfRAD2DEG );
+	fprintf( file, "i %20.10f\n", m_stSatellite.inclination * g_Constants::RAD2DEG );
+	fprintf( file, "O %20.10f\n", m_stSatellite.Longi_RisingNode * g_Constants::RAD2DEG );
+	fprintf( file, "w %20.10f\n", m_stSatellite.perigee * g_Constants::RAD2DEG );
+	fprintf( file, "M %20.10f\n", m_stSatellite.MeanAnomaly * g_Constants::RAD2DEG );
 	
 	fprintf( file, "x  %19.9f y  %19.9f r %19.9f\n", xw, yw, sqrt( xw * xw + yw * yw ) );
 	fprintf( file, "xv %19.9f yv %19.9f v %19.9f\n", xwdot, ywdot, sqrt( xwdot * xwdot + ywdot * ywdot ) );
@@ -939,15 +939,15 @@ BOOL cTwoBody::deltaVEffect( double dxdot, double dydot, char *fileName )
 	fprintf( file, "after\n" );
 	fprintf( file, "a %20.10f\n", m_stSatellite.semi_major );
 	fprintf( file, "e %20.10f\n", m_stSatellite.eccentricity );
-	fprintf( file, "i %20.10f\n", m_stSatellite.inclination * g_dfRAD2DEG );
-	fprintf( file, "O %20.10f\n", m_stSatellite.Longi_RisingNode * g_dfRAD2DEG );
-	fprintf( file, "w %20.10f\n", m_stSatellite.perigee * g_dfRAD2DEG );
-	fprintf( file, "M %20.10f\n", m_stSatellite.MeanAnomaly * g_dfRAD2DEG );
+	fprintf( file, "i %20.10f\n", m_stSatellite.inclination * g_Constants::RAD2DEG );
+	fprintf( file, "O %20.10f\n", m_stSatellite.Longi_RisingNode * g_Constants::RAD2DEG );
+	fprintf( file, "w %20.10f\n", m_stSatellite.perigee * g_Constants::RAD2DEG );
+	fprintf( file, "M %20.10f\n", m_stSatellite.MeanAnomaly * g_Constants::RAD2DEG );
 	
 	fprintf( file, "x  %19.9f y  %19.9f r %19.9f\n", xw, yw, sqrt( xw * xw + yw * yw ) );
 	fprintf( file, "xv %19.9f yv %19.9f v %19.9f\n", xwdot, ywdot, sqrt( xwdot * xwdot + ywdot * ywdot ) );
 
-	return TRUE;
+	return true;
 }
 
 

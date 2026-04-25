@@ -9,11 +9,12 @@
 //----------------------------------------------------------------------------
 
 #include <math.h>
+#include <algorithm>
 #include "Matrix.h"
 
 #include "CholeskyDecomposition.h"
 
-class cMatrix g_Matrix;
+cMatrix g_Matrix;
 
 /****************************************************************************
 
@@ -46,6 +47,7 @@ void cMatrix::Vec_Assign( double *Source, double *Result, int n )
 		return;
 	}
 
+	#pragma omp simd
 	for( int i = 0; i < n; i++ ) Result[ i ] = Source[ i ];
 }
 
@@ -130,11 +132,11 @@ void cMatrix::Mat_Multiply_By_Constant( double *Mat, int m, int n,
 
 ****************************************************************************/
 
-BOOL cMatrix::Mat_Transpose( double *Mat, int m, int n )
+bool cMatrix::Mat_Transpose( double *Mat, int m, int n )
 {
 	if( !Mat )
 	{
-		return FALSE;
+		return false;
 	}
 
 	double *ttt = new double[ m * n ];
@@ -142,7 +144,7 @@ BOOL cMatrix::Mat_Transpose( double *Mat, int m, int n )
 
 	if( !ttt )
 	{
-		return FALSE;
+		return false;
 	}
 
 	try
@@ -163,11 +165,11 @@ BOOL cMatrix::Mat_Transpose( double *Mat, int m, int n )
 
 		delete []ttt;
 
-		return TRUE;
+		return true;
 	}
 	catch( ... )
 	{
-		return FALSE;
+		return false;
 	}
 } 
 
@@ -195,13 +197,13 @@ BOOL cMatrix::Mat_Transpose( double *Mat, int m, int n )
 
 ****************************************************************************/
 
-BOOL cMatrix::UpperTriMat_Transpose( double *TriMat, int n )
+bool cMatrix::UpperTriMat_Transpose( double *TriMat, int n )
 {
 	double *a = new double[ n * ( n + 1 ) / 2 ];
 
 	if( !a )
 	{
-		return FALSE;
+		return false;
 	}
 
 	int l = 0;
@@ -220,7 +222,7 @@ BOOL cMatrix::UpperTriMat_Transpose( double *TriMat, int n )
 
 	delete []a;
 
-	return TRUE;
+	return true;
 }
 
 /****************************************************************************
@@ -247,13 +249,13 @@ BOOL cMatrix::UpperTriMat_Transpose( double *TriMat, int n )
 
 	 ****************************************************************************/
 
-BOOL cMatrix::LowerTriMat_Transpose( double *TriMat, int n )
+bool cMatrix::LowerTriMat_Transpose( double *TriMat, int n )
 {
 	double *a = new double[ n * ( n + 1 ) / 2 ];
 
 	if( !a )
 	{
-		return FALSE;
+		return false;
 	}
 
 	int l = 0;
@@ -272,7 +274,7 @@ BOOL cMatrix::LowerTriMat_Transpose( double *TriMat, int n )
 
 	delete []a;
 
-	return TRUE;
+	return true;
 }
 
 
@@ -287,7 +289,7 @@ BOOL cMatrix::LowerTriMat_Transpose( double *TriMat, int n )
 
 ****************************************************************************/
 
-BOOL cMatrix::TriMat_Inverse( double *TriMat, int n )
+bool cMatrix::TriMat_Inverse( double *TriMat, int n )
 {
     double c, bs, bf, bh, *b;
 	double *ea;
@@ -297,7 +299,7 @@ BOOL cMatrix::TriMat_Inverse( double *TriMat, int n )
 
 	if( !b )
 	{
-		return FALSE;
+		return false;
 	}
 
 	try
@@ -364,11 +366,11 @@ BOOL cMatrix::TriMat_Inverse( double *TriMat, int n )
 
 		delete []b;
 
-		return TRUE;
+		return true;
 	}
 	catch( ... )
 	{
-		return FALSE;
+		return false;
 	}
 }
 
@@ -383,13 +385,13 @@ BOOL cMatrix::TriMat_Inverse( double *TriMat, int n )
 
 ****************************************************************************/
 
-BOOL cMatrix::Mat_Inverse( double *Mat, int n )
+bool cMatrix::Mat_Inverse( double *Mat, int n )
 {
 	double *b = new double [  n * n ];
 
 	if( !b )
 	{
-		return FALSE;
+		return false;
 	}
 
 	try
@@ -456,11 +458,11 @@ BOOL cMatrix::Mat_Inverse( double *Mat, int n )
 
 		delete []b;
 
-		return TRUE;
+		return true;
 	}
 	catch( ... )
 	{
-		return FALSE;
+		return false;
 	}	
 }
 
@@ -479,6 +481,7 @@ double cMatrix::Vec_Multiply_Vec( double *Vec1, double *Vec2, int n )
 
     double res = 0;
   
+    #pragma omp simd reduction(+:res)
     for( int i = 0; i < n; i++ ) res = res + Vec1[ i ] * Vec2[ i ];
 
     return res;
@@ -920,14 +923,14 @@ void cMatrix::Mat_Multiply_Mat( double *Mat1, double *Mat2,
   the result matrix is also a lower triangular matrix with the same storage arrangement
 
 ***************************************************************************************/
-BOOL cMatrix::LowerTriMat_Multiply_LowerTriMat( double *LowerTriMat1, 
+bool cMatrix::LowerTriMat_Multiply_LowerTriMat( double *LowerTriMat1, 
 		                                        double *LowerTriMat2, 
 										        double *LowerTriResult, 
 		                                        int n )
 {
 	if( !LowerTriMat1 || !LowerTriMat2 || !LowerTriResult )
 	{
-		return FALSE;
+		return false;
 	}
 
 	int l = 0;
@@ -948,7 +951,7 @@ BOOL cMatrix::LowerTriMat_Multiply_LowerTriMat( double *LowerTriMat1,
 		}
 	}
 
-	return TRUE;
+	return true;
 }
 
 
@@ -968,14 +971,14 @@ BOOL cMatrix::LowerTriMat_Multiply_LowerTriMat( double *LowerTriMat1,
 
 ***************************************************************************************/
 
-BOOL cMatrix::UpperTriMat_Multiply_UpperTriMat( double *UpperTriMat1, 
+bool cMatrix::UpperTriMat_Multiply_UpperTriMat( double *UpperTriMat1, 
 		                                        double *UpperTriMat2, 
 										        double *UpperTriResult, 
 		                                        int n )
 {
 	if( !UpperTriMat1 || !UpperTriMat2 || !UpperTriResult )
 	{
-		return FALSE;
+		return false;
 	}
 
 	int n1 = n * ( n + 1 ) / 2;
@@ -987,7 +990,7 @@ BOOL cMatrix::UpperTriMat_Multiply_UpperTriMat( double *UpperTriMat1,
 		if( U1 ) delete []U1;
 		if( U2 ) delete []U2;
 
-		return FALSE;
+		return false;
 	}
 
 
@@ -1001,13 +1004,13 @@ BOOL cMatrix::UpperTriMat_Multiply_UpperTriMat( double *UpperTriMat1,
 		delete []U1;
 		delete []U2;
 
-		return TRUE;
+		return true;
 	}
 
 	delete []U1;
 	delete []U2;
 
-	return FALSE;
+	return false;
 }
 
 /****************************************************************************
@@ -1173,15 +1176,15 @@ void cMatrix::TriMat2Mat( double *TriMat, double *Result_Mat, int n )
    
 ****************************************************************************/
 
-BOOL cMatrix::PartitionedMatrixInverse( double *p11, double *p12, double *p22, 
+bool cMatrix::PartitionedMatrixInverse( double *p11, double *p12, double *p22, 
 									    int n1, int n2 )
 {
 	if( !p11 || !p12 || !p22 )
 	{
-		return FALSE;
+		return false;
 	}
 
-	int n = __max( n1 * n1, n2 * n2 );
+	int n = std::max( n1 * n1, n2 * n2 );
 	double *p11o = new double[ n ];
 	double *p22o = new double[ n ];
 	double *t1 = new double[ n ];
@@ -1199,7 +1202,7 @@ BOOL cMatrix::PartitionedMatrixInverse( double *p11, double *p12, double *p22,
 		if( t3 ) delete []t3;
 		if( p21 ) delete []p21;
 
-		return FALSE;
+		return false;
 	}
 
 	Vec_Assign( p11, p11o, n1 * n1 );
@@ -1218,7 +1221,7 @@ BOOL cMatrix::PartitionedMatrixInverse( double *p11, double *p12, double *p22,
 		if( t3 ) delete []t3;
 		if( p21 ) delete []p21;
 
-		return FALSE;
+		return false;
 	}
 	TriMat2Mat( t1, p11, n1 );
 
@@ -1233,7 +1236,7 @@ BOOL cMatrix::PartitionedMatrixInverse( double *p11, double *p12, double *p22,
 		if( t3 ) delete []t3;
 		if( p21 ) delete []p21;
 
-		return FALSE;
+		return false;
 	}
 	TriMat2Mat( t2, p22, n2 );
 	
@@ -1256,7 +1259,7 @@ BOOL cMatrix::PartitionedMatrixInverse( double *p11, double *p12, double *p22,
 		if( t3 ) delete []t3;
 		if( p21 ) delete []p21;
 
-		return FALSE;
+		return false;
 	}
 	TriMat2Mat( t2, t1, n1 );
 
@@ -1275,7 +1278,7 @@ BOOL cMatrix::PartitionedMatrixInverse( double *p11, double *p12, double *p22,
 		if( t3 ) delete []t3;
 		if( p21 ) delete []p21;
 
-		return FALSE;
+		return false;
 	}
 	TriMat2Mat( t2, t3, n2 );
 
@@ -1295,7 +1298,7 @@ BOOL cMatrix::PartitionedMatrixInverse( double *p11, double *p12, double *p22,
 	if( t3 ) delete []t3;
 	if( p21 ) delete []p21;
 
-	return TRUE;
+	return true;
 }
 
 /****************************************************************************
@@ -1420,18 +1423,18 @@ void cMatrix::VectorProduct( double *pdfVec1, double *pdfVec2, double *pdfVec3 )
 			eigenvalue evalues[ 0 ], e21, e22, e23 ... e2n is the normalized eigenvector 
 			corresponding to eigenvalue evalues[ 1 ], etc
 
-  bValueOnly: TRUE if only eigenvalues are required.
+  bValueOnly: true if only eigenvalues are required.
 
 ****************************************************************************/
 
-BOOL cMatrix::EigensSymmMatrix( double *TriMat, int n, 
+bool cMatrix::EigensSymmMatrix( double *TriMat, int n, 
 							    double *evalues, double *evectors, 
-								BOOL bValueOnly )
+								bool bValueOnly )
 
 {
 	if( !TriMat || !evalues || !evectors )
 	{
-		return FALSE;
+		return false;
 	}
 
 	double *a = new double[ n * n + 1 ];
@@ -1444,7 +1447,7 @@ BOOL cMatrix::EigensSymmMatrix( double *TriMat, int n,
 		if( d ) delete []d;
 		if( e ) delete []e;
 
-		return FALSE;
+		return false;
 	}
 
 	int i, j, k, l;
@@ -1575,7 +1578,7 @@ TWO:
 				delete []d;
 				delete []e;
 
-				return FALSE;
+				return false;
 			}
 
 			iter++;
@@ -1632,7 +1635,7 @@ TWO:
 	delete []d;
 	delete []e;
 
-	return TRUE;
+	return true;
 }
 
 /******************************************************************************

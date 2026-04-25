@@ -6,7 +6,7 @@
 ***************************************************************************************/
 #pragma once
 
-#include <windows.h>
+// #include <windows.h> // Removed for cross-platform compatibility
 
 class cGreenwichST
 {
@@ -17,16 +17,14 @@ public:
 
 	static double ComputeGST( double dfTJD );
 
-	static BOOL ComputeGST( double dfIntJD, double dfFractionJD, 
+	static bool ComputeGST( double dfIntJD, double dfFractionJD, 
 		                    double dfEquinoxEquation,  double &dfGST );
-	static BOOL ComputeGST( double dfIntJD, double dfFractionJD, 
+	static bool ComputeGST( double dfIntJD, double dfFractionJD, 
 		                    double dfEquinoxEquation, double &dfGST,  
-							double &dfSinGST, double &dfCosGST );
-	static BOOL ComputeGSTMatrixECEF2TOD( double dfIntJD, double dfFractionJD, 
+				            double &dfSinGST, double &dfCosGST );
+	static bool ComputeGSTMatrixECEF2TOD( double dfIntJD, double dfFractionJD, 
 		                                  double dfEquinoxEquation, double *pdfGSTMatrix );
-	static BOOL ComputeGSTMatrixTOD2ECEF( double dfIntJD, double dfFractionJD, 
+	static bool ComputeGSTMatrixTOD2ECEF( double dfIntJD, double dfFractionJD, 
 		                                  double dfEquinoxEquation, double *pdfGSTMatrix );
 };
-
-#endif
 

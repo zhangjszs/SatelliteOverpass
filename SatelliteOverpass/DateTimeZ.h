@@ -9,7 +9,7 @@
 ***********************************************************************************/
 #pragma once
 
-#include <windows.h>
+// Windows-specific headers are not needed for cross-platform compatibility
 
 extern class cDateTimeZ g_DateTimeZ;
 

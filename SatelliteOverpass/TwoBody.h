@@ -7,12 +7,11 @@
 ***************************************************************************/
 #pragma once
 
-#include <windows.h>
 #include <math.h>
 
-#include "constant.h"
+#include "ModernConstants.h"
 
-const double dfEarthGMIOD = sqrt( g_dfEarthGM / pow( g_dfEarthSemiMajor, 3.0 ) * 3600.0 );
+const double dfEarthGMIOD = sqrt( g_Constants::EARTH_GM / pow( g_Constants::EARTH_SEMI_MAJOR, 3.0 ) * 3600.0 );
 const double dfMuIOD = 1.0;
 
 struct TwoBodyOrbitElement
@@ -72,13 +71,13 @@ public:
 
 	void ComputeElementFromPosVel();
 
-	static BOOL ComputeElementsFromPosVel( double *pdfPos, double *pdfVel, double dfGM,
+	static bool ComputeElementsFromPosVel( double *pdfPos, double *pdfVel, double dfGM,
 		                                   double *pdfElements,
-										   BOOL bPartial = FALSE, double *pdfPartial = NULL );
-	static BOOL ComputePosVelFromElements( double dfJDRef, double dfJD,
+		                                   bool bPartial = false, double *pdfPartial = NULL );
+	static bool ComputePosVelFromElements( double dfJDRef, double dfJD,
 		                                   double *pdfElements, double dfGM, 
 		                                   double *pdfPos, double *pdfVel );
-	static BOOL MeanAnomaly2TrueAnomaly( double a, double e, double &M, double &f, double &E );
+	static bool MeanAnomaly2TrueAnomaly( double a, double e, double &M, double &f, double &E );
 
 	static bool computePartials( double *pos, double *vel, double GM, double *element, bool E2X, double *partial );
 
@@ -86,7 +85,6 @@ public:
 
 	static double ComputeMeanMotion( double a, double dfGM );
 
-	BOOL deltaVEffect( double dxdot, double dydot, char *fileName );
+	bool deltaVEffect( double dxdot, double dydot, char *fileName );
 };
 
-#endif

@@ -8,7 +8,7 @@
 ***************************************************************************************/
 
 #include <math.h>
-#include "constant.h"
+#include "Constant.h"
 #include "GreenwichSiderealTime.h"
 
 cGreenwichST::cGreenwichST()
@@ -74,7 +74,7 @@ double cGreenwichST::ComputeGST( double dfTJD )
 
 ***************************************************************************************/
 
-BOOL cGreenwichST::ComputeGST( double dfIntJD, double dfFractionJD, double dfEquinoxEquation,
+bool cGreenwichST::ComputeGST( double dfIntJD, double dfFractionJD, double dfEquinoxEquation,
                                double &dfGST )
 {
 	double dfJD = dfIntJD, dfDay = dfFractionJD;
@@ -114,7 +114,7 @@ BOOL cGreenwichST::ComputeGST( double dfIntJD, double dfFractionJD, double dfEqu
 	
     dfGST = fmod( dfGST, g_dfTWOPI );
 
-	return TRUE;
+	return true;
 }
 
 /***************************************************************************************
@@ -125,15 +125,15 @@ BOOL cGreenwichST::ComputeGST( double dfIntJD, double dfFractionJD, double dfEqu
 
 ***************************************************************************************/
 
-BOOL cGreenwichST::ComputeGST( double dfIntJD, double dfFractionJD, double dfEquinoxEquation,
+bool cGreenwichST::ComputeGST( double dfIntJD, double dfFractionJD, double dfEquinoxEquation,
                                double &dfGST,  double &dfSinGST,    double &dfCosGST )
 {
-	if( !ComputeGST( dfIntJD, dfFractionJD, dfEquinoxEquation, dfGST ) ) return FALSE;
+	if( !ComputeGST( dfIntJD, dfFractionJD, dfEquinoxEquation, dfGST ) ) return false;
 
 	dfSinGST = sin( dfGST );
 	dfCosGST = cos( dfGST );
 
-	return TRUE;
+	return true;
 }
 
 /***************************************************************************************
@@ -144,12 +144,12 @@ BOOL cGreenwichST::ComputeGST( double dfIntJD, double dfFractionJD, double dfEqu
 
 ***************************************************************************************/
 
-BOOL cGreenwichST::ComputeGSTMatrixECEF2TOD( double dfIntJD, double dfFractionJD, double dfEquinoxEquation,
+bool cGreenwichST::ComputeGSTMatrixECEF2TOD( double dfIntJD, double dfFractionJD, double dfEquinoxEquation,
                                              double *pdfGSTMatrix )
 {
 	double dfGST, dfSinGST, dfCosGST;
 
-	if( !ComputeGST( dfIntJD, dfFractionJD, dfEquinoxEquation, dfGST, dfSinGST, dfCosGST ) ) return FALSE;
+	if( !ComputeGST( dfIntJD, dfFractionJD, dfEquinoxEquation, dfGST, dfSinGST, dfCosGST ) ) return false;
 
 	pdfGSTMatrix[ 0 ] = pdfGSTMatrix[ 4 ] = dfCosGST;
 	pdfGSTMatrix[ 2 ] = pdfGSTMatrix[ 5 ] = pdfGSTMatrix[ 6 ] = pdfGSTMatrix[ 7 ] = 0.0;
@@ -158,7 +158,7 @@ BOOL cGreenwichST::ComputeGSTMatrixECEF2TOD( double dfIntJD, double dfFractionJD
 	pdfGSTMatrix[ 8 ] = 1.0;
 
 
-	return TRUE;
+	return true;
 }
 
 /***************************************************************************************
@@ -167,15 +167,15 @@ BOOL cGreenwichST::ComputeGSTMatrixECEF2TOD( double dfIntJD, double dfFractionJD
 
 ***************************************************************************************/
 
-BOOL cGreenwichST::ComputeGSTMatrixTOD2ECEF( double dfIntJD, double dfFractionJD, double dfEquinoxEquation,
+bool cGreenwichST::ComputeGSTMatrixTOD2ECEF( double dfIntJD, double dfFractionJD, double dfEquinoxEquation,
                                              double *pdfGSTMatrix )
 {
 	if( !ComputeGSTMatrixECEF2TOD( dfIntJD, dfFractionJD, dfEquinoxEquation, pdfGSTMatrix ) )
-		return FALSE;
+		return false;
 
 	pdfGSTMatrix[ 1 ] *= (-1.0);
 	pdfGSTMatrix[ 3 ] *= (-1.0);
 
-	return TRUE;
+	return true;
 }
 

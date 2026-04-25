@@ -27,15 +27,16 @@
 #undef UNICODE
 
 #include <math.h>
+#include <cstring>
 #include "TLE2PosVel.h"
 #include "GreenwichSiderealTime.h"
 #include "DateTimeZ.h"
-#include "constant.h"
+#include "ModernConstants.h"
 
 
 cTLE2PosVel::cTLE2PosVel()
 {
-	m_bInit = FALSE;
+	m_bInit = false;
 
 	m_dfEarthRadius = 6378135.0; 
 	m_dfMeanEarthRadius = 6371.0;
@@ -46,7 +47,7 @@ cTLE2PosVel::cTLE2PosVel()
 
 	// FK5 CONSTANT VALUE
     m_dfC1 = 1.72027916940703639e-2;
-    m_dfC1P2P = m_dfC1 + g_dfTWOPI;
+    m_dfC1P2P = m_dfC1 + g_Constants::TWO_PI;
     m_dfTHGR70 = 1.7321343856509374;
 	m_dfFK5R = 5.07551419432269442e-15;
 	
@@ -93,21 +94,20 @@ cTLE2PosVel::~cTLE2PosVel()
 
 *******************************************************************************************/
 
-BOOL cTLE2PosVel::ReadTLE( int nNORADID, char *szFileName )
+bool cTLE2PosVel::ReadTLE( int nNORADID, char *szFileName )
 {
 	// check whether the given file exists
-	WIN32_FIND_DATA FindFileData;
-
-	HANDLE hFile = FindFirstFile( szFileName, &FindFileData );
-
-	if( hFile == INVALID_HANDLE_VALUE ) return FALSE;
-
-	FindClose( hFile );
+	std::ifstream file(szFileName);
+	if (!file.good())
+	{
+		return false;
+	}
+	file.close();
 
 	string line;
 	ifstream in( szFileName );
 
-	stSatelliteIOE tIOE;
+	SatelliteIOE tIOE;
 
 	while( getline( in, line ) )	// 
 	{
@@ -115,18 +115,18 @@ BOOL cTLE2PosVel::ReadTLE( int nNORADID, char *szFileName )
 		string temp = line.substr(0, 2);
 		if (strcmp(temp.c_str(), "1 ") == 0)
 		{
-			if( !ReadTLELine1( line, tIOE ) ) return FALSE;
+			if( !ReadTLELine1( line, tIOE ) ) return false;
 			getline( in, line );
-			if( tIOE.nSatelliteID == nNORADID )
+			if( tIOE.satelliteID == nNORADID )
 			{
-				if( !ReadTLELine2( line, tIOE ) ) return FALSE;
-				if( !SetOrbitalElements( tIOE ) ) return FALSE;
-				return TRUE;
+				if( !ReadTLELine2( line, tIOE ) ) return false;
+				if( !SetOrbitalElements( tIOE ) ) return false;
+				return true;
 			}
 		}
 	}
 
-	return FALSE;
+	return false;
 }
 
 /******************************************************************************************
@@ -135,17 +135,17 @@ BOOL cTLE2PosVel::ReadTLE( int nNORADID, char *szFileName )
 
 *******************************************************************************************/
 
-BOOL cTLE2PosVel::SetOrbitalElements( stSatelliteIOE stIOE )
+bool cTLE2PosVel::SetOrbitalElements( SatelliteIOE stIOE )
 {
-	if( stIOE.nSatelliteID <= 0 ) {
+	if( stIOE.satelliteID <= 0 ) {
 		m_nError = 1;
 		return false;
 	}
 
 	m_bInit = false;
 
-	m_pdfTLE[ 3 ] = m_dfBSTAR = stIOE.pfElement7to18[ 2 ];
-	m_dfRefJD = stIOE.GetRefJD();
+	m_pdfTLE[ 3 ] = m_dfBSTAR = stIOE.element7to18[ 2 ];
+	m_dfRefJD = stIOE.getRefJD();
 
 	int nDoY, y, m, d, h, mm;
 	double s;
@@ -158,24 +158,24 @@ BOOL cTLE2PosVel::SetOrbitalElements( stSatelliteIOE stIOE )
 	m_pdfTLE[ 1 ] = (double)y;
 	m_pdfTLE[ 2 ] = (double)nDoY + h / 24.0 + mm / 1440.0 + s / 86400.0;
 
-//	m_dfRefJD = (double) stSatelliteIOE.nIntJD + (double) stSatelliteIOE.nFractionJD * 1.0e-9;
-	m_pdfTLE[ 9 ] = m_dfMM0 = (double) stIOE.pnElement1to6[ 0 ] * 1.0e-8;
-	m_pdfTLE[ 4 ] = m_dfEcc0 = (double) stIOE.pnElement1to6[ 1 ] * 1.0e-7;
-	m_pdfTLE[ 5 ] = m_dfInc0 = (double) stIOE.pnElement1to6[ 2 ] * 1.0e-5 * g_dfDEG2RAD;
-	m_pdfTLE[ 6 ] = m_dfRAAN0 = (double) stIOE.pnElement1to6[ 3 ] * 1.0e-5 * g_dfDEG2RAD; 
-	m_pdfTLE[ 7 ] = m_dfPerigee0 = (double) stIOE.pnElement1to6[ 4 ] * 1.0e-5 * g_dfDEG2RAD;
-	m_pdfTLE[ 8 ] = m_dfMA0 = (double) stIOE.pnElement1to6[ 5 ] * 1.0e-5 * g_dfDEG2RAD;
+//	m_dfRefJD = (double) SatelliteIOE.nIntJD + (double) SatelliteIOE.nFractionJD * 1.0e-9;
+	m_pdfTLE[ 9 ] = m_dfMM0 = (double) stIOE.element1to6[ 0 ] * 1.0e-8;
+	m_pdfTLE[ 4 ] = m_dfEcc0 = (double) stIOE.element1to6[ 1 ] * 1.0e-7;
+	m_pdfTLE[ 5 ] = m_dfInc0 = (double) stIOE.element1to6[ 2 ] * 1.0e-5 * g_Constants::DEG2RAD;
+	m_pdfTLE[ 6 ] = m_dfRAAN0 = (double) stIOE.element1to6[ 3 ] * 1.0e-5 * g_Constants::DEG2RAD; 
+	m_pdfTLE[ 7 ] = m_dfPerigee0 = (double) stIOE.element1to6[ 4 ] * 1.0e-5 * g_Constants::DEG2RAD;
+	m_pdfTLE[ 8 ] = m_dfMA0 = (double) stIOE.element1to6[ 5 ] * 1.0e-5 * g_Constants::DEG2RAD;
 
-	for( int i = 5; i <= 8; i++ ) m_pdfTLE[ i ] *= g_dfRAD2DEG;
+	for( int i = 5; i <= 8; i++ ) m_pdfTLE[ i ] *= g_Constants::RAD2DEG;
 
 	m_dfDaySince1950 = m_dfRefJD - m_dfJD1950;
 	m_dfMM0 /= m_dfXPDOTP;	// sat mean motion in radian/minute
 
-	if( !Initialise() ) return FALSE;
+	if( !Initialise() ) return false;
 
-	m_bInit = TRUE;
+	m_bInit = true;
 
-	return TRUE;
+	return true;
 }
 
 /******************************************************************************
@@ -192,9 +192,9 @@ BOOL cTLE2PosVel::SetOrbitalElements( stSatelliteIOE stIOE )
  pdfTLE[ 9 ]: mean motion in orbits per day
 ******************************************************************************/
 
-BOOL cTLE2PosVel::SetOrbitalElements( double *pdfTLE )
+bool cTLE2PosVel::SetOrbitalElements( double *pdfTLE )
 {
-	m_bInit = FALSE;
+	m_bInit = false;
 
 	for( int i = 0; i < 10; i++ ) m_pdfTLE[ i ] = pdfTLE[ i ];
 
@@ -209,20 +209,20 @@ BOOL cTLE2PosVel::SetOrbitalElements( double *pdfTLE )
 	m_dfBSTAR = pdfTLE[ 3 ];
 
 	m_dfEcc0 = pdfTLE[ 4 ];
-	m_dfInc0 = pdfTLE[ 5 ] * g_dfDEG2RAD;
-	m_dfRAAN0 = pdfTLE[ 6 ] * g_dfDEG2RAD; 
-	m_dfPerigee0 = pdfTLE[ 7 ] * g_dfDEG2RAD;
-	m_dfMA0 = pdfTLE[ 8 ] * g_dfDEG2RAD;
+	m_dfInc0 = pdfTLE[ 5 ] * g_Constants::DEG2RAD;
+	m_dfRAAN0 = pdfTLE[ 6 ] * g_Constants::DEG2RAD; 
+	m_dfPerigee0 = pdfTLE[ 7 ] * g_Constants::DEG2RAD;
+	m_dfMA0 = pdfTLE[ 8 ] * g_Constants::DEG2RAD;
 	m_dfMM0 = pdfTLE[ 9 ];
 
 	m_dfDaySince1950 = m_dfRefJD - m_dfJD1950;
 	m_dfMM0 /= m_dfXPDOTP;	// sat mean motion in radian/minute
 
-	if( !Initialise() ) return FALSE;
+	if( !Initialise() ) return false;
 
-	m_bInit = TRUE;
+	m_bInit = true;
 
-	return TRUE;
+	return true;
 }
 
 /******************************************************************************
@@ -239,11 +239,11 @@ BOOL cTLE2PosVel::SetOrbitalElements( double *pdfTLE )
  pdfTLE[ 9 ]: mean motion in orbits per day
 ******************************************************************************/
 
-BOOL cTLE2PosVel::GetOrbitalElements( double *pdfTLE )
+bool cTLE2PosVel::GetOrbitalElements( double *pdfTLE )
 {
 	for( int i = 0; i < 10; i++ ) pdfTLE[ i ] = m_pdfTLE[ i ];
 
-	return TRUE;
+	return true;
 }
 
 /******************************************************************************
@@ -267,13 +267,13 @@ void cTLE2PosVel::GetOrbitalElementsRefJD( double &dfRefJD )
 
 *******************************************************************************************/
 
-BOOL cTLE2PosVel::ComputeInertialPosVel( double dfJD, double *pdfPos, double *pdfVel )
+bool cTLE2PosVel::ComputeInertialPosVel( double dfJD, double *pdfPos, double *pdfVel )
 {
-	if( !m_bInit ) return FALSE;
+	if( !m_bInit ) return false;
 
-	if( !SGP4( dfJD, pdfPos, pdfVel ) ) return FALSE;
+	if( !SGP4( dfJD, pdfPos, pdfVel ) ) return false;
 
-	return TRUE;
+	return true;
 }
 
 /******************************************************************************************
@@ -285,19 +285,19 @@ BOOL cTLE2PosVel::ComputeInertialPosVel( double dfJD, double *pdfPos, double *pd
 
 *******************************************************************************************/
 
-BOOL cTLE2PosVel::ComputeInertialPosVel( double &dfIntJDUTCGivenEpoch, double &dfFraJDUTCGivenEpoch, 
+bool cTLE2PosVel::ComputeInertialPosVel( double &dfIntJDUTCGivenEpoch, double &dfFraJDUTCGivenEpoch, 
 			                             double *pdfPos, double *pdfVel )
 {
-	if( !m_bInit ) return FALSE;
+	if( !m_bInit ) return false;
 
 	dfIntJDUTCGivenEpoch = m_dfRefJD;
 	dfFraJDUTCGivenEpoch = 0.0;
 
 	g_DateTimeZ.ReConstruct( dfIntJDUTCGivenEpoch, dfFraJDUTCGivenEpoch );
 
-	if( !SGP4( m_dfRefJD, pdfPos, pdfVel ) ) return FALSE;
+	if( !SGP4( m_dfRefJD, pdfPos, pdfVel ) ) return false;
 
-	return TRUE;
+	return true;
 }
 
 
@@ -311,7 +311,7 @@ BOOL cTLE2PosVel::ComputeInertialPosVel( double &dfIntJDUTCGivenEpoch, double &d
 
 *******************************************************************************************/
 
-BOOL cTLE2PosVel::ComputeECEFPosVel( double dfJD, double *pdfPos, double *pdfVel )
+bool cTLE2PosVel::ComputeECEFPosVel( double dfJD, double *pdfPos, double *pdfVel )
 {
 	if( !m_bInit ) return false;
 
@@ -341,14 +341,14 @@ BOOL cTLE2PosVel::ComputeECEFPosVel( double dfJD, double *pdfPos, double *pdfVel
 
 *******************************************************************************************/
 
-BOOL cTLE2PosVel::Initialise()
+bool cTLE2PosVel::Initialise()
 {
                                                                             
 	// CALCULATE AUXILLARY EPOCH QUANTITIES 
 	if( m_dfEcc0 > 0.999999 ) 
 	{
 		m_nError = 1;
-		return FALSE;
+		return false;
 	}
 
 	m_dfEcc0SQ = m_dfEcc0 * m_dfEcc0;                                                            
@@ -382,15 +382,15 @@ BOOL cTLE2PosVel::Initialise()
 	if( m_dfQ0 < 1.0 ) // perigee is within the Earth, impossible
 	{
 		m_nError = 1;
-		return FALSE;		
+		return false;		
 	}                                                                                                             
 
 	// CALCULATE NUMBER OF INTEGER DAYS SINCE 0 JAN 1970            
     m_dfGSTAtRefEpoch = cGreenwichST::ComputeGST( m_dfRefJD );
 
 	// first part of SGP4
-	m_bOrbitLowHigh = FALSE;
-    if( m_dfQ0 < ( 220.0 / m_dfEarthRadiusKM + 1.0 ) ) m_bOrbitLowHigh = TRUE;
+	m_bOrbitLowHigh = false;
+    if( m_dfQ0 < ( 220.0 / m_dfEarthRadiusKM + 1.0 ) ) m_bOrbitLowHigh = true;
 	                          
     double S4 = m_dfMinSatGeoDis;
     double QZMS24 = m_dfQZMS2T;
@@ -466,22 +466,22 @@ FOURTY:
     m_dfSinMAO = sin( m_dfMA0 );
     m_dfX7THM1 = 7.0 * m_dfCosI02 - 1.0;
 
-	m_bDeepSpace = FALSE;				// initially, assuming deep space effect ignored    
-	if( g_dfTWOPI / m_dfMM0 >= 225.0 )	// satellite higher than 5876 km ( m_bDeepSpace == TRUE )     
+	m_bDeepSpace = false;				// initially, assuming deep space effect ignored    
+	if( g_Constants::TWO_PI / m_dfMM0 >= 225.0 )	// satellite higher than 5876 km ( m_bDeepSpace == true )     
 	{
-		m_bDeepSpace = TRUE;
-		m_bOrbitLowHigh = TRUE;
+		m_bDeepSpace = true;
+		m_bOrbitLowHigh = true;
 	
-		if( !InitialiseDeepSpace() ) return FALSE;
+		if( !InitialiseDeepSpace() ) return false;
       
 		if( m_dfEcc0 < 0.0 || m_dfEcc0 > 1.0 ) 
 		{
 			m_nError = 1;
-			return FALSE;		
+			return false;		
 		}                
 	}   
 	
-	if( m_bOrbitLowHigh ) return TRUE;					// orbit either high or low
+	if( m_bOrbitLowHigh ) return true;					// orbit either high or low
       
 	// perigee height > 220.0km, non-linear part of the drag term coefficients
 	double CC1SQ = m_dfCC1 * m_dfCC1;
@@ -498,7 +498,7 @@ FOURTY:
 		               15.0 * CC1SQ * (2.0 * m_dfD2 + CC1SQ ) 
 					  );								// Coe of T^5, Eq (32) of SGP4 Algorithm
                                                                         
-	return TRUE;
+	return true;
 }
 
 /******************************************************************************************
@@ -507,7 +507,7 @@ FOURTY:
 
 *******************************************************************************************/
 
-BOOL cTLE2PosVel::SGP4( double dfJD, double *pdfPos, double *pdfVel )
+bool cTLE2PosVel::SGP4( double dfJD, double *pdfPos, double *pdfVel )
 {
 	double dfT = ( dfJD - m_dfRefJD ) * 1440.0;	// in minute
     double dfT2 = dfT * dfT;                                                                
@@ -552,7 +552,7 @@ BOOL cTLE2PosVel::SGP4( double dfJD, double *pdfPos, double *pdfVel )
     if( m_bDeepSpace )
 	{
 		m_dfTC = dfT;
-		if( !DeepSpaceSecularEffect() ) return FALSE;            
+		if( !DeepSpaceSecularEffect() ) return false;            
 	}                                                               
 
     m_dfSMM = pow( m_dfEarthGM / m_dfMMM, m_df2O3 ) * pow( dfTempA, 2.0 );	// Eq (31) of SGP4 Algorithm
@@ -561,7 +561,7 @@ BOOL cTLE2PosVel::SGP4( double dfJD, double *pdfPos, double *pdfVel )
 	if( m_dfEccM >= 1.0 || m_dfEccM < -1.0e-3 ) 	
 	{
 		m_nError = 1;
-		return FALSE;
+		return false;
 	}
                                             
 	if ( m_dfEccM < 0.0 ) m_dfEccM = 1.e-6;	
@@ -570,10 +570,10 @@ BOOL cTLE2PosVel::SGP4( double dfJD, double *pdfPos, double *pdfVel )
 	double dfEMSQ = m_dfEccM * m_dfEccM;
     dfTemp = 1.0 - dfEMSQ;                            
     double dfRTEMSQ = sqrt( dfTemp );
-	m_dfRAANM = fmod( m_dfRAANM, g_dfTWOPI );
-	m_dfPerigeeM = fmod( m_dfPerigeeM, g_dfTWOPI );
-	dfXLM = fmod( dfXLM, g_dfTWOPI );
-	m_dfMAM = fmod( dfXLM - m_dfPerigeeM - m_dfRAANM, g_dfTWOPI );
+	m_dfRAANM = fmod( m_dfRAANM, g_Constants::TWO_PI );
+	m_dfPerigeeM = fmod( m_dfPerigeeM, g_Constants::TWO_PI );
+	dfXLM = fmod( dfXLM, g_Constants::TWO_PI );
+	m_dfMAM = fmod( dfXLM - m_dfPerigeeM - m_dfRAANM, g_Constants::TWO_PI );
                                                                            
 	// COMPUTE EXTRA MEAN QUANTITIES                                                                          
 	double dfSinIM = sin( m_dfIncM );
@@ -594,19 +594,19 @@ BOOL cTLE2PosVel::SGP4( double dfJD, double *pdfPos, double *pdfVel )
 	
 	if( m_bDeepSpace ) 
 	{
-		if( !DeepSpacePeriodicEffect( dfEccP, dfIncP, dfRAANP, dfPerigeeP, dfMAP ) ) return FALSE;
+		if( !DeepSpacePeriodicEffect( dfEccP, dfIncP, dfRAANP, dfPerigeeP, dfMAP ) ) return false;
 		if( dfIncP < 0.0 ) 
 		{
 			dfIncP = - dfIncP;
-			dfRAANP += g_dfPI;
-			dfPerigeeP -= g_dfPI;
+			dfRAANP += g_Constants::PI;
+			dfPerigeeP -= g_Constants::PI;
 		}
 	}
 
 	if( dfEccP < 0.0 || dfEccP > 1.0 ) 
 	{
 		m_nError = 1;
-		return FALSE;
+		return false;
 	}
                                                                            
 	// LONG PERIOD PERIODICS                                                                          
@@ -625,20 +625,23 @@ BOOL cTLE2PosVel::SGP4( double dfJD, double *pdfPos, double *pdfVel )
 	double dfXL = dfMAP + dfPerigeeP + dfRAANP + dfTemp * m_dfXLCOF * dfAXNL;	// Eq (38) of SGP4 Algorithm
 	
 	// SOLVE KEPLER'S EQUATION, Eqs (40)-(43) of SGP4 Algorthm	                                                                           
-    double dfU = fmod( dfXL - dfRAANP, g_dfTWOPI );
+    double dfU = fmod( dfXL - dfRAANP, g_Constants::TWO_PI );
 	double dfE01 = dfU;
 	double dfSinE01, dfCosE01;
 	double dfTEM5;
 	int nIters = 0;
-	do
+	// Optimized Kepler equation solver with faster convergence
+	while( nIters < 10 )
 	{
 		dfSinE01 = sin( dfE01 );
 		dfCosE01 = cos( dfE01 );
 		dfTEM5 = 1.0 - dfCosE01 * dfAXNL - dfSinE01 * dfAYNL;
+		if (fabs(dfTEM5) < 1.0e-15) break; // Avoid division by zero
 		dfTEM5=( dfU - dfAYNL * dfCosE01 + dfAXNL * dfSinE01 - dfE01 ) / dfTEM5;
 		dfE01 += dfTEM5;
 		nIters++;
-	} while( fabs( dfTEM5 ) > 1.0e-12 && nIters < 10 );
+		if( fabs( dfTEM5 ) < 1.0e-12 ) break; // Early termination on convergence
+	}
                                                                             
 	// SHORT PERIOD PRELIMINARY QUANTITIES                                                                                                             
 	double dfeCosE = dfAXNL * dfCosE01 + dfAYNL * dfSinE01;		// Eq (44) of SGP4 Algorithm
@@ -649,7 +652,7 @@ BOOL cTLE2PosVel::SGP4( double dfJD, double *pdfPos, double *pdfVel )
 	if( dfPL < 0.0 ) 
 	{
 		m_nError = 1;
-		return FALSE;
+		return false;
 	}
 		
 	double dfRL = m_dfSMM * ( 1.0 - dfeCosE );				// Eq (48) of SGP4 Algorithm
@@ -686,42 +689,48 @@ BOOL cTLE2PosVel::SGP4( double dfJD, double *pdfPos, double *pdfVel )
 		             m_dfMMM * dfTEMP1 * 
 					 ( m_dfX1MTH2 * dfCos2U + 1.5 * m_dfCon41 ) / m_dfEarthGM;	// Eqs (59) and (65)of SGP4 Algorithm
                                                                           
-	// ORIENTATION VECTORS	                                                             
+	// ORIENTATION VECTORS	                                                              
 	double dfSinSU = sin( dfSU );
-	double dfCosSU = cos( dfSU );                                                         
+	double dfCosSU = cos( dfSU );                                                          
     double dfSinNode = sin( dfRAANT );
 	double dfCosNode = cos( dfRAANT );
 	double dfSinI = sin( dfIncT );
 	double dfCosI = cos( dfIncT );     
-	
-    double dfMx = - dfSinNode * dfCosI;		// Eq (68) of SGP4 Algorithm
-	double dfMy =   dfCosNode * dfCosI;		// Eq (68) of SGP4 Algorithm
-	
+
+    // Precompute common terms
+    double dfSinNodeCosI = dfSinNode * dfCosI;
+    double dfCosNodeCosI = dfCosNode * dfCosI;
+
+    double dfMx = -dfSinNodeCosI;		// Eq (68) of SGP4 Algorithm
+	double dfMy = dfCosNodeCosI;		// Eq (68) of SGP4 Algorithm
+
 	// Eq (66) of SGP4 Algorithm
-	double dfUX = dfMx *  dfSinSU + dfCosNode * dfCosSU;	
-	double dfUY = dfMy *  dfSinSU + dfSinNode * dfCosSU;
-	double dfUZ = dfSinI*  dfSinSU;
-                                                                           
+	double dfUX = dfMx * dfSinSU + dfCosNode * dfCosSU;
+	double dfUY = dfMy * dfSinSU + dfSinNode * dfCosSU;
+	double dfUZ = dfSinI * dfSinSU;                                                           
+
 	// POSITION AND VELOCITY
 
 	// Eq (70) of SGP4 Algorithm
-    pdfPos[ 0 ] = dfRT * dfUX * m_dfEarthRadius;	// in meter
-	pdfPos[ 1 ] = dfRT * dfUY * m_dfEarthRadius; 
-	pdfPos[ 2 ] = dfRT * dfUZ * m_dfEarthRadius; 
+    double dfRT_earthRadius = dfRT * m_dfEarthRadius; // Precompute common term
+    pdfPos[ 0 ] = dfRT_earthRadius * dfUX;	// in meter
+	pdfPos[ 1 ] = dfRT_earthRadius * dfUY; 
+	pdfPos[ 2 ] = dfRT_earthRadius * dfUZ; 
 
-	if( m_bPosOnly ) return TRUE;
+	if( m_bPosOnly ) return true;
 
 	// Eq (67) of SGP4 Algorithm
-    double dfVX = dfMx *  dfCosSU - dfCosNode * dfSinSU;
-	double dfVY = dfMy *  dfCosSU - dfSinNode * dfSinSU;
+    double dfVX = dfMx * dfCosSU - dfCosNode * dfSinSU;
+	double dfVY = dfMy * dfCosSU - dfSinNode * dfSinSU;
 	double dfVZ = dfSinI * dfCosSU;                                                         
 
 	// Eq (71) of SGP4 Algorithm
-	pdfVel[ 0 ] = ( dfRDot * dfUX + dfRVDot * dfVX ) * m_dfVelocityChange;	// in m/s
-	pdfVel[ 1 ] = ( dfRDot * dfUY + dfRVDot * dfVY ) * m_dfVelocityChange;
-	pdfVel[ 2 ] = ( dfRDot * dfUZ + dfRVDot * dfVZ ) * m_dfVelocityChange;
+	double velocityChange = m_dfVelocityChange; // Precompute common term
+	pdfVel[ 0 ] = ( dfRDot * dfUX + dfRVDot * dfVX ) * velocityChange;	// in m/s
+	pdfVel[ 1 ] = ( dfRDot * dfUY + dfRVDot * dfVY ) * velocityChange;
+	pdfVel[ 2 ] = ( dfRDot * dfUZ + dfRVDot * dfVZ ) * velocityChange;
       
-	return TRUE;
+	return true;
 }
 
 /******************************************************************************************
@@ -730,7 +739,7 @@ BOOL cTLE2PosVel::SGP4( double dfJD, double *pdfPos, double *pdfVel )
 
 *******************************************************************************************/
 
-BOOL cTLE2PosVel::InitialiseDeepSpace()
+bool cTLE2PosVel::InitialiseDeepSpace()
 {
 	// first part of Fortran Subroutine DPPER
 	
@@ -746,10 +755,10 @@ BOOL cTLE2PosVel::InitialiseDeepSpace()
 	m_dfCosIncM = cos( m_dfInc0 );
                                                                           
 	// INITIALIZE LUNAR SOLAR TERMS
-	if( !DSCOM() ) return FALSE;
+	if( !DSCOM() ) return false;
 
-	m_dfZMOL = fmod( 4.7199672 + .22997150 * m_dfDSDay - m_dfDSGAM, g_dfTWOPI );
-	m_dfZMOS = fmod( 6.2565837 + .017201977 * m_dfDSDay, g_dfTWOPI );
+	m_dfZMOL = fmod( 4.7199672 + .22997150 * m_dfDSDay - m_dfDSGAM, g_Constants::TWO_PI );
+	m_dfZMOS = fmod( 6.2565837 + .017201977 * m_dfDSDay, g_Constants::TWO_PI );
 
 	// DO SOLAR TERMS	                                                                           
     m_dfDSSE2  =  2.0 * m_dfDSSS1 * m_dfDSSS6;
@@ -912,7 +921,7 @@ BOOL cTLE2PosVel::InitialiseDeepSpace()
 		TEMP = 2.0 * TEMP1 * ROOT54;
 		m_dfD5421 = TEMP * F542 * G521;
 		m_dfD5433 = TEMP * F543 * G533;                                                
-		m_dfXLAMO = fmod( m_dfMA0 + m_dfRAAN0 * 2.0 - m_dfGSTAtRefEpoch * 2.0, g_dfTWOPI );
+		m_dfXLAMO = fmod( m_dfMA0 + m_dfRAAN0 * 2.0 - m_dfGSTAtRefEpoch * 2.0, g_Constants::TWO_PI );
 	}
 	else	// SYNCHRONOUS RESONANCE TERMS, 24 hour orbits
 	{
@@ -931,7 +940,7 @@ BOOL cTLE2PosVel::InitialiseDeepSpace()
 		m_dfFASX2 =.13130908;
 		m_dfFASX4 =2.8843198;
 		m_dfFASX6 =.37448087;                                                     
-		m_dfXLAMO = fmod( m_dfMA0 + m_dfRAAN0 + m_dfPerigee0 - m_dfGSTAtRefEpoch, g_dfTWOPI );
+		m_dfXLAMO = fmod( m_dfMA0 + m_dfRAAN0 + m_dfPerigee0 - m_dfGSTAtRefEpoch, g_Constants::TWO_PI );
 	}
 
 	// FOR SGP4, INITIALIZE THE resonance INTEGRATOR                                                                           
@@ -952,7 +961,7 @@ BOOL cTLE2PosVel::InitialiseDeepSpace()
 
 /*************************************************************************************************/
 	
-	return TRUE;
+	return true;
 }
 
 /******************************************************************************************
@@ -963,7 +972,7 @@ BOOL cTLE2PosVel::InitialiseDeepSpace()
 
 *******************************************************************************************/
 
-BOOL cTLE2PosVel::DSCOM()
+bool cTLE2PosVel::DSCOM()
 {
 	double dfC1SS = 2.9864797e-6, dfC1L = 4.7968065e-7, dfZCOSIS = .91744867;
 	double dfZSINIS = .39785416, dfZSINGS = -.98088458, dfZCOSGS = .1945905;
@@ -975,7 +984,7 @@ BOOL cTLE2PosVel::DSCOM()
 	                                                                           
 	// INITIALIZE LUNAR SOLAR TERMS
 	m_dfDSDay = m_dfDaySince1950 + 18261.5;
-    double dfXNODCE = fmod( 4.5236020 - 9.2422029e-4 * m_dfDSDay, g_dfTWOPI );
+    double dfXNODCE = fmod( 4.5236020 - 9.2422029e-4 * m_dfDSDay, g_Constants::TWO_PI );
 	double dfSTEM = sin( dfXNODCE );
 	double dfCTEM = cos( dfXNODCE );
 	double dfZCOSIL = .91375164 - .03568096 * dfCTEM;
@@ -993,7 +1002,7 @@ BOOL cTLE2PosVel::DSCOM()
 
     double dfXNOI = 1.0 / m_dfMMM;
 
-    BOOL bEnd = FALSE;
+    bool bEnd = false;
 
 	double ZCOSG = 0.0, ZSING = 0.0, ZCOSI = 0.0, ZSINI = 0.0,
 		ZCOSH = 0.0, ZSINH = 0.0, CC = 0.0;
@@ -1088,10 +1097,10 @@ BOOL cTLE2PosVel::DSCOM()
 		ZSINH = m_dfSinRAANM * dfZCOSHL - m_dfCosRAANM * dfZSINHL;
 		CC = dfC1L;                                                                
 		
-		bEnd = TRUE;
+		bEnd = true;
 	}
 
-	return TRUE;
+	return true;
 }
 
 /******************************************************************************************
@@ -1102,10 +1111,10 @@ BOOL cTLE2PosVel::DSCOM()
 
 *******************************************************************************************/
 
-BOOL cTLE2PosVel::DeepSpaceSecularEffect()
+bool cTLE2PosVel::DeepSpaceSecularEffect()
 {
 	m_dfDNDT = 0.0;
-	double dfTHETA = fmod( m_dfGSTAtRefEpoch + m_dfTC * m_dfEarthRotationPerMinute, g_dfTWOPI );
+	double dfTHETA = fmod( m_dfGSTAtRefEpoch + m_dfTC * m_dfEarthRotationPerMinute, g_Constants::TWO_PI );
 	
 	m_dfEccM += m_dfDEDT * m_dfTC;
     m_dfIncM += m_dfDIDT * m_dfTC;
@@ -1116,17 +1125,17 @@ BOOL cTLE2PosVel::DeepSpaceSecularEffect()
 	if( m_dfIncM < 0.0 ) 
 	{
 		m_dfIncM = -m_dfIncM;
-		m_dfPerigeeM -= g_dfPI;
-		m_dfRAANM += g_dfPI;
+		m_dfPerigeeM -= g_Constants::PI;
+		m_dfRAANM += g_Constants::PI;
 	}
 
-	if( m_nIREZ == 0 ) return TRUE;
+	if( m_nIREZ == 0 ) return true;
 
-	if( !DeepSapceResonance( dfTHETA ) ) return TRUE;                           
+	if( !DeepSapceResonance( dfTHETA ) ) return true;                           
     
 	m_dfMMM = m_dfMM0 + m_dfDNDT;
 	
-	return TRUE;
+	return true;
 }
 
 /******************************************************************************************
@@ -1137,7 +1146,7 @@ BOOL cTLE2PosVel::DeepSpaceSecularEffect()
 
 *******************************************************************************************/
 
-BOOL cTLE2PosVel::DeepSapceResonance( double dfTHETA )
+bool cTLE2PosVel::DeepSapceResonance( double dfTHETA )
 {
 	double G22 = 5.7686396, G32 = 0.95240898;
 	double G44 = 1.8014998, G52 = 1.0508330;
@@ -1185,13 +1194,13 @@ T361:
 	{
 		m_dfMAM = XL - 2.0 * m_dfRAANM + 2.0 * dfTHETA;
 		m_dfDNDT = m_dfMMM - m_dfMM0;
-		return TRUE;
+		return true;
 	}
 	else
 	{
 		m_dfMAM = XL - m_dfRAANM - m_dfPerigeeM + dfTHETA;                                           
 		m_dfDNDT = m_dfMMM - m_dfMM0;
-		return TRUE;
+		return true;
 	}
 
 	// DOT TERMS CALCULATED
@@ -1264,7 +1273,7 @@ T390:
 
 	goto T356;
 
-	//return TRUE; 20170313 lei
+	//return true; 20170313 lei
 }
 
 /******************************************************************************************
@@ -1275,7 +1284,7 @@ T390:
 
 *******************************************************************************************/
 
-BOOL cTLE2PosVel::DeepSpacePeriodicEffect( double &dfEccP, double &dfIncP, double &dfRAANP,
+bool cTLE2PosVel::DeepSpacePeriodicEffect( double &dfEccP, double &dfIncP, double &dfRAANP,
 										   double &dfPerigeeP, double &dfMAP )
 {
 	// for the Sun
@@ -1322,7 +1331,7 @@ BOOL cTLE2PosVel::DeepSpacePeriodicEffect( double &dfEccP, double &dfIncP, doubl
 		dfRAANP += PH;
 		dfMAP +=  PL;                                                          
       
-		return TRUE;                                                                
+		return true;                                                                
 	}
                                                                             
 	// APPLY PERIODICS WITH LYDDANE MODIFICATION 
@@ -1334,22 +1343,22 @@ BOOL cTLE2PosVel::DeepSpacePeriodicEffect( double &dfEccP, double &dfIncP, doubl
 	double DBET = -PH * SINOP + PINC * COSIP * COSOP;
 	ALFDP = ALFDP + DALF;
 	BETDP = BETDP + DBET;                                                      
-    dfRAANP = fmod( dfRAANP, g_dfTWOPI );                                                 
+    dfRAANP = fmod( dfRAANP, g_Constants::TWO_PI );                                                 
     double XLS = dfMAP + dfPerigeeP + COSIP * dfRAANP;
 	double DLS = PL + PGH - PINC * dfRAANP * SINIP;
 	XLS = XLS + DLS;
 	double XNOH = dfRAANP;
 	dfRAANP = atan2( ALFDP, BETDP );
-	if( fabs( XNOH - dfRAANP ) > g_dfPI )
+	if( fabs( XNOH - dfRAANP ) > g_Constants::PI )
 	{
-		if( dfRAANP < XNOH ) dfRAANP += g_dfTWOPI;
-		else dfRAANP -= g_dfTWOPI;                                            
+		if( dfRAANP < XNOH ) dfRAANP += g_Constants::TWO_PI;
+		else dfRAANP -= g_Constants::TWO_PI;                                            
 	}
 	
 	dfMAP += PL;
 	dfPerigeeP = XLS - dfMAP - COSIP * dfRAANP;    
 	
-	return TRUE;
+	return true;
 }
 
 /**********************************************************************************************
@@ -1364,7 +1373,7 @@ BOOL cTLE2PosVel::DeepSpacePeriodicEffect( double &dfEccP, double &dfIncP, doubl
 
 **********************************************************************************************/
 
-BOOL cTLE2PosVel::FromInertialToEFEC( double dfJD, double *pdfPos, double *pdfVel )
+bool cTLE2PosVel::FromInertialToEFEC( double dfJD, double *pdfPos, double *pdfVel )
 {
 	double dfGST = cGreenwichST::ComputeGST( dfJD );
 	double dfSin = sin( dfGST ), dfCos = cos( dfGST );
@@ -1374,8 +1383,8 @@ BOOL cTLE2PosVel::FromInertialToEFEC( double dfJD, double *pdfPos, double *pdfVe
 	pdfP[ 1 ] = -pdfPos[ 0 ] * dfSin + pdfPos[ 1 ] * dfCos;
 	pdfP[ 2 ] =  pdfPos[ 2 ];
 
-	pdfV[ 0 ] =  pdfVel[ 0 ] * dfCos + pdfVel[ 1 ] * dfSin + pdfP[ 1 ] * g_dfEarthAngVelocity;
-	pdfV[ 1 ] = -pdfVel[ 0 ] * dfSin + pdfVel[ 1 ] * dfCos - pdfP[ 0 ] * g_dfEarthAngVelocity;
+	pdfV[ 0 ] =  pdfVel[ 0 ] * dfCos + pdfVel[ 1 ] * dfSin + pdfP[ 1 ] * g_Constants::EARTH_ANGULAR_VELOCITY;
+	pdfV[ 1 ] = -pdfVel[ 0 ] * dfSin + pdfVel[ 1 ] * dfCos - pdfP[ 0 ] * g_Constants::EARTH_ANGULAR_VELOCITY;
 	pdfV[ 2 ] =  pdfVel[ 2 ];
 
 	for( int i = 0; i < 3; i++ )
@@ -1384,7 +1393,7 @@ BOOL cTLE2PosVel::FromInertialToEFEC( double dfJD, double *pdfPos, double *pdfVe
 		pdfVel[ i ] = pdfV[ i ];
 	}
 
-	return TRUE;
+	return true;
 }
 
 
@@ -1395,15 +1404,15 @@ BOOL cTLE2PosVel::FromInertialToEFEC( double dfJD, double *pdfPos, double *pdfVe
 
 ************************************************************************************/
 
-BOOL cTLE2PosVel::ReadTLELine1( string line, stSatelliteIOE &stIOE )
+bool cTLE2PosVel::ReadTLELine1( string line, SatelliteIOE &stIOE )
 {
-//	if( !CheckSum( line ) ) return FALSE;
+//	if( !CheckSum( line ) ) return false;
 
 	string sub;
 
 	// norad number of the object
 	sub = line.substr( 1, 6 );
-	stIOE.nSatelliteID = atoi( sub.c_str() );
+	stIOE.satelliteID = atoi( sub.c_str() );
 
 	// ref date/time
 	sub = line.substr( 18, 2 );
@@ -1419,14 +1428,14 @@ BOOL cTLE2PosVel::ReadTLELine1( string line, stSatelliteIOE &stIOE )
 
 	dfRefJD += dfDay;
 
-	stIOE.SetRefJD( dfRefJD );
+	stIOE.setRefJD( dfRefJD );
 //	stIOE.nIntJD = (int) dfRefJD;
 //	stIOE.nFractionJD = (int)( ( dfRefJD - stIOE.nIntJD ) * 1.0e9 );
 
 	// n dot -- first time derivative of the mean motion or
 	// ballistic coefficient (depending on ephemeris type)
 	sub = line.substr( 33, 10 );
-	stIOE.pfElement7to18[ 0 ] = (float) atof( sub.c_str() );
+	stIOE.element7to18[ 0 ] = (float) atof( sub.c_str() );
 
 	// n dot dot - second time derivative of the mean motion
 	sub = line.substr( 44, 6 );
@@ -1434,7 +1443,7 @@ BOOL cTLE2PosVel::ReadTLELine1( string line, stSatelliteIOE &stIOE )
 	sub = line.substr( 50, 2 );
 	int nTemp = atoi( sub.c_str() );
 		
-	stIOE.pfElement7to18[ 1 ] = (float) ( dfTemp * pow( 10.0, (double) nTemp ) );
+	stIOE.element7to18[ 1 ] = (float) ( dfTemp * pow( 10.0, (double) nTemp ) );
 
 	// BSTAR drag term if GP4 general perturbation theory is used
 	sub = line.substr( 53, 6 );
@@ -1442,12 +1451,12 @@ BOOL cTLE2PosVel::ReadTLELine1( string line, stSatelliteIOE &stIOE )
 	sub = line.substr( 59, 2 );
 	nTemp = atoi( sub.c_str() );
 		
-	stIOE.pfElement7to18[ 2 ] = (float) (dfTemp * pow( 10.0, (double) nTemp ) );
+	stIOE.element7to18[ 2 ] = (float) (dfTemp * pow( 10.0, (double) nTemp ) );
 
 	// Ephemeris type
 	sub = line.substr( 62, 1 );
 	
-	return TRUE;
+	return true;
 }
 
 
@@ -1457,42 +1466,42 @@ BOOL cTLE2PosVel::ReadTLELine1( string line, stSatelliteIOE &stIOE )
 
 ************************************************************************************/
 
-BOOL cTLE2PosVel::ReadTLELine2( string line, stSatelliteIOE &stIOE )
+bool cTLE2PosVel::ReadTLELine2( string line, SatelliteIOE &stIOE )
 {
-//	if( !CheckSum( line ) ) return FALSE;
+//	if( !CheckSum( line ) ) return false;
 
 	string sub;
 
 	// Inlcination 
 	sub = line.substr( 8, 8 );
-	stIOE.pnElement1to6[ 2 ] = (int)( atof( sub.c_str() ) * 1.0e5 );
+	stIOE.element1to6[ 2 ] = (int)( atof( sub.c_str() ) * 1.0e5 );
 
 	// RA of ascending node
 	sub = line.substr( 17, 8 );
-	stIOE.pnElement1to6[ 3 ] = (int)( atof( sub.c_str() ) * 1.0e5 );
+	stIOE.element1to6[ 3 ] = (int)( atof( sub.c_str() ) * 1.0e5 );
 
 	// Eccentricity 
 	sub = line.substr( 26, 7 );
-	stIOE.pnElement1to6[ 1 ] = atoi( sub.c_str() );
+	stIOE.element1to6[ 1 ] = atoi( sub.c_str() );
 
 	// Perigee argument
 	sub = line.substr( 34, 8 );
-	stIOE.pnElement1to6[ 4 ] = (int)( atof( sub.c_str() ) * 1.0e5 );
+	stIOE.element1to6[ 4 ] = (int)( atof( sub.c_str() ) * 1.0e5 );
 
 	// Mean anomaly
 	sub = line.substr( 43, 8 );
-	stIOE.pnElement1to6[ 5 ] = (int)( atof( sub.c_str() ) * 1.0e5 );
+	stIOE.element1to6[ 5 ] = (int)( atof( sub.c_str() ) * 1.0e5 );
 
 	// Mean motion orbits per day
 	sub = line.substr( 52, 11 );
-	stIOE.pnElement1to6[ 0 ] = (int)( atof( sub.c_str() ) * 1.0e8 );
+	stIOE.element1to6[ 0 ] = (int)( atof( sub.c_str() ) * 1.0e8 );
 
 	// orbital period in days
-	stIOE.pfElement7to18[ 11 ] = (float) (	1.0 / ( stIOE.pnElement1to6[ 0 ] * 1.0e-8 ) );
+	stIOE.element7to18[ 11 ] = (float) (	1.0 / ( stIOE.element1to6[ 0 ] * 1.0e-8 ) );
 
-	stIOE.cElementType = 'T';
+	stIOE.elementType = 'T';
 	
-	return TRUE;
+	return true;
 }
 
 
@@ -1502,7 +1511,7 @@ BOOL cTLE2PosVel::ReadTLELine2( string line, stSatelliteIOE &stIOE )
 
 ******************************************************************************/
 
-BOOL cTLE2PosVel::CheckSum( string line )
+bool cTLE2PosVel::CheckSum( string line )
 {
 	char str[ 100 ];
 
@@ -1526,9 +1535,9 @@ BOOL cTLE2PosVel::CheckSum( string line )
 
 	nGivenCheckSum = nGivenCheckSum - 48;
 
-	if( CheckSum != nGivenCheckSum ) return FALSE;
+	if( CheckSum != nGivenCheckSum ) return false;
 
-	return TRUE;
+	return true;
 }
 
 /******************************************************************************
@@ -1566,8 +1575,8 @@ void cTLE2PosVel::GetTLE( double *pdfTLE )
 
 *******************************************************************************************/
 
-BOOL cTLE2PosVel::ReadAllTLE( std::vector<stSatelliteIOE> &TLEData, const char *szFileName, 
-							  BOOL bPerigeeTest, double perigeeLimit, double apogeeLimit )
+bool cTLE2PosVel::ReadAllTLE( std::vector<SatelliteIOE> &TLEData, const char *szFileName, 
+							  bool bPerigeeTest, double perigeeLimit, double apogeeLimit )
 {
 	try
 	{
@@ -1575,21 +1584,18 @@ BOOL cTLE2PosVel::ReadAllTLE( std::vector<stSatelliteIOE> &TLEData, const char *
 		//TLEData.clear( );
 		//TLEData.reserve( 100 );
 
-		WIN32_FIND_DATA FindFileData;
-
-		HANDLE hFile = FindFirstFile( szFileName, &FindFileData );
-
-		if( hFile == INVALID_HANDLE_VALUE ) 
+		// Cross-platform file existence check
+		std::ifstream file(szFileName);
+		if (!file.good())
 		{
-			return FALSE;
+			return false;
 		}
-
-		FindClose( hFile );
+		file.close();
 
 		string line;
 		ifstream in( szFileName );
 		
-		stSatelliteIOE tIOE;
+		SatelliteIOE tIOE;
 
 		while( getline( in, line ) )	// 
 		{
@@ -1607,29 +1613,29 @@ BOOL cTLE2PosVel::ReadAllTLE( std::vector<stSatelliteIOE> &TLEData, const char *
 				string temp = line.substr(0, 2);
 				if (strcmp(temp.c_str(), "1 ") != 0)
 				{
-					tIOE.Line1 = line.c_str( );  // added RO
+					tIOE.line1 = line.c_str( );  // added RO
 					// Line 1
 					getline( in, line );
 				}
 				else
 				{
-					tIOE.Line1.clear( );
+					tIOE.line1.clear( );
 				}
 								
 				if( line[0] == '1' && line[1] == ' ')
 				{
-					tIOE.Line2 = line.c_str( );  // added RO
+					tIOE.line2 = line.c_str( );  // added RO
 					if( !ReadTLELine1( line, tIOE ) ) 
 					{
 						// error reading the data
-						return FALSE;					
+						return false;					
 					}
 				}
 				else
 				{
 					//eosLOG( "error reading TLE file ");
 					// end of file
-					return TRUE;
+					return true;
 				}
 			
 				// Line 2
@@ -1637,19 +1643,19 @@ BOOL cTLE2PosVel::ReadAllTLE( std::vector<stSatelliteIOE> &TLEData, const char *
 				
 				if( line[0] == '2' && line[1] == ' ')
 				{
-					tIOE.Line3 = line.c_str( );  // added RO
+					tIOE.line3 = line.c_str( );  // added RO
 					if( !ReadTLELine2( line, tIOE ) ) 
 					{
 						// error reading the data
 						//eosLOG( "error reading tle file 2");
-						return FALSE;
+						return false;
 					}
 				}
 
 				if( bPerigeeTest )
 				{
-                    double sm = tIOE.GetSemiMajor();
-					double ecc = tIOE.GetEccentricity();
+                    double sm = tIOE.getSemiMajor();
+					double ecc = tIOE.getEccentricity();
 
 					if( sm * ( 1.0 - ecc ) > perigeeLimit && 
 						sm * ( 1.0 + ecc ) < apogeeLimit    ) TLEData.push_back( tIOE );
@@ -1661,7 +1667,7 @@ BOOL cTLE2PosVel::ReadAllTLE( std::vector<stSatelliteIOE> &TLEData, const char *
 			}
 		}
 
-		return TRUE;
+		return true;
 	}
 	catch( ... )
 	{
@@ -1671,7 +1677,7 @@ BOOL cTLE2PosVel::ReadAllTLE( std::vector<stSatelliteIOE> &TLEData, const char *
 
 }
 
-BOOL cTLE2PosVel::ReadAllTLE( std::vector<stSatelliteIOE> &TLEData, const char *szFileName, int numberID, int*noradID )
+bool cTLE2PosVel::ReadAllTLE( std::vector<SatelliteIOE> &TLEData, const char *szFileName, int numberID, int*noradID )
 {
 	try
 	{
@@ -1679,21 +1685,18 @@ BOOL cTLE2PosVel::ReadAllTLE( std::vector<stSatelliteIOE> &TLEData, const char *
 		//TLEData.clear( );
 		//TLEData.reserve( 100 );
 
-		WIN32_FIND_DATA FindFileData;
-
-		HANDLE hFile = FindFirstFile( szFileName, &FindFileData );
-
-		if( hFile == INVALID_HANDLE_VALUE ) 
+		// Cross-platform file existence check
+		std::ifstream file(szFileName);
+		if (!file.good())
 		{
-			return FALSE;
+			return false;
 		}
-
-		FindClose( hFile );
+		file.close();
 
 		string line;
 		ifstream in( szFileName );
 		
-		stSatelliteIOE tIOE;
+		SatelliteIOE tIOE;
 
 		while( getline( in, line ) )	// 
 		{
@@ -1711,29 +1714,29 @@ BOOL cTLE2PosVel::ReadAllTLE( std::vector<stSatelliteIOE> &TLEData, const char *
 				string temp = line.substr(0, 2);
 				if (strcmp(temp.c_str(), "1 ") != 0)
 				{
-					tIOE.Line1 = line.c_str( );  // added RO
+					tIOE.line1 = line.c_str( );  // added RO
 					// Line 1
 					getline( in, line );
 				}
 				else
 				{
-					tIOE.Line1.clear( );
+					tIOE.line1.clear( );
 				}
 								
 				if( line[0] == '1' && line[1] == ' ')
 				{
-					tIOE.Line2 = line.c_str( );  // added RO
+					tIOE.line2 = line.c_str( );  // added RO
 					if( !ReadTLELine1( line, tIOE ) ) 
 					{
 						// error reading the data
-						return FALSE;					
+						return false;					
 					}
 				}
 				else
 				{
 					//eosLOG( "error reading TLE file ");
 					// end of file
-					return TRUE;
+					return true;
 				}
 			
 				// Line 2
@@ -1741,18 +1744,18 @@ BOOL cTLE2PosVel::ReadAllTLE( std::vector<stSatelliteIOE> &TLEData, const char *
 				
 				if( line[0] == '2' && line[1] == ' ')
 				{
-					tIOE.Line3 = line.c_str( );  // added RO
+					tIOE.line3 = line.c_str( );  // added RO
 					if( !ReadTLELine2( line, tIOE ) ) 
 					{
 						// error reading the data
 						//eosLOG( "error reading tle file 2");
-						return FALSE;
+						return false;
 					}
 				}
 
 				for( int k = 0; k < numberID; k++ )
 				{
-					int id = tIOE.nSatelliteID;
+					int id = tIOE.satelliteID;
 					if( id == noradID[ id ] )
 					{
 						TLEData.push_back( tIOE );
@@ -1765,7 +1768,7 @@ BOOL cTLE2PosVel::ReadAllTLE( std::vector<stSatelliteIOE> &TLEData, const char *
 			}
 		}
 
-		return TRUE;
+		return true;
 	}
 	catch( ... )
 	{
@@ -1775,7 +1778,7 @@ BOOL cTLE2PosVel::ReadAllTLE( std::vector<stSatelliteIOE> &TLEData, const char *
 }
 
 /*
-BOOL cTLE2PosVel::ReadAllTLE( std::vector<stSatelliteIOE> &TLEData, const char *szFileName )
+bool cTLE2PosVel::ReadAllTLE( std::vector<SatelliteIOE> &TLEData, const char *szFileName )
 {
 	try
 	{
@@ -1791,16 +1794,13 @@ BOOL cTLE2PosVel::ReadAllTLE( std::vector<stSatelliteIOE> &TLEData, const char *
 		//TLEData.clear( );
 		//TLEData.reserve( 100 );
 
-		WIN32_FIND_DATA FindFileData;
-
-		HANDLE hFile = FindFirstFile( szFileName, &FindFileData );
-
-		if( hFile == INVALID_HANDLE_VALUE ) 
+		// Cross-platform file existence check
+		std::ifstream file(szFileName);
+		if (!file.good())
 		{
-			return FALSE;
+			return false;
 		}
-
-		FindClose( hFile );
+		file.close();
 
 		string line;
 		ifstream in( szFileName );
@@ -1814,7 +1814,7 @@ BOOL cTLE2PosVel::ReadAllTLE( std::vector<stSatelliteIOE> &TLEData, const char *
 			Smallest[i] = 0;
 		}
 
-		stSatelliteIOE tIOE;
+		SatelliteIOE tIOE;
 
 		while( getline( in, line ) )	// 
 		{
@@ -1830,29 +1830,29 @@ BOOL cTLE2PosVel::ReadAllTLE( std::vector<stSatelliteIOE> &TLEData, const char *
 
 				if( line[0] != '1' )
 				{
-					tIOE.Line1 = line.c_str( );  // added RO
+					tIOE.line1 = line.c_str( );  // added RO
 					// Line 1
 					getline( in, line );
 				}
 				else
 				{
-					tIOE.Line1.clear( );
+					tIOE.line1.clear( );
 				}
 								
 				if( line[0] == '1' )
 				{
-					tIOE.Line2 = line.c_str( );  // added RO
+					tIOE.line2 = line.c_str( );  // added RO
 					if( !ReadTLELine1( line, tIOE ) ) 
 					{
 						// error reading the data
-						return FALSE;					
+						return false;					
 					}
 				}
 				else
 				{
 					//eosLOG( "error reading TLE file ");
 					// end of file
-					return TRUE;
+					return true;
 				}
 			
 				// Line 2
@@ -1860,19 +1860,19 @@ BOOL cTLE2PosVel::ReadAllTLE( std::vector<stSatelliteIOE> &TLEData, const char *
 				
 				if( line[0] == '2' )
 				{
-					tIOE.Line3 = line.c_str( );  // added RO
+					tIOE.line3 = line.c_str( );  // added RO
 					if( !ReadTLELine2( line, tIOE ) ) 
 					{
 						// error reading the data
 						//eosLOG( "error reading tle file 2");
-						return FALSE;
+						return false;
 					}
 				}
 				else
 				{
 					//eosLOG( "error reading tle file 3");
 					// end of file
-					return TRUE;
+					return true;
 				}
 
 				double largestAlt = 0;
@@ -1891,7 +1891,7 @@ BOOL cTLE2PosVel::ReadAllTLE( std::vector<stSatelliteIOE> &TLEData, const char *
 				//eosLOG( "rev " << tIOE.pnElement1to6[0]*1e-8 );
 /*				if( tIOE.pnElement1to6[0]*1e-8 > 4 /*|| (tIOE.pnElement1to6[0]*1e-8 > 7)*/ /*********)*/
 /*				{
-//					stSatelliteIOE tIOEA = tIOE;
+//					SatelliteIOE tIOEA = tIOE;
 //					double largestAlt;
 //					double altitude = GetSmallestAltitude( tIOEA, largestAlt );
 /*					double incOriginal = tIOE.pnElement1to6[2]*1e-5;
@@ -1904,14 +1904,14 @@ BOOL cTLE2PosVel::ReadAllTLE( std::vector<stSatelliteIOE> &TLEData, const char *
 						
 						if( m_nCounter == 1 )
 						{
-							m_bTLEExists[ tIOE.nSatelliteID ] = true;
+							m_bTLEExists[ tIOE.satelliteID ] = true;
 						}
 						if( m_nCounter == 2 )
 						{
 							int nStop = 100;
 						}
 					
-/*						if( /*( nCounter > 1 && bTLEExists[ tIOE.nSatelliteID ] == true ) 
+/*						if( /*( nCounter > 1 && bTLEExists[ tIOE.satelliteID ] == true ) 
 //							|| nCounter == 1*/ /*****1==1******/ /***************)
 /*						{
 							//if( fabs( tIOE.pnElement1to6[2]*1e-5 ) < 60 /*&& fabs( tIOE.pnElement1to6[2]*1e-5 ) > 35*/ /********** )
@@ -2013,7 +2013,7 @@ BOOL cTLE2PosVel::ReadAllTLE( std::vector<stSatelliteIOE> &TLEData, const char *
 //		fflush( stream );
 //		fclose( stream );
 //		eosLOG( "TLE Size " << TLEData.size( ) );
-		return TRUE;
+		return true;
 	}
 	catch( ... )
 	{

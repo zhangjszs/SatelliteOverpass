@@ -32,6 +32,7 @@
 #include "CoordinateSystem.h"
 #include "DataStructure.h"
 #include "TLE2PosVel.h"
+#include "DateTimeZ.h"
 
 namespace fs = std::filesystem;
 using namespace SatelliteOverpass::Constants;
@@ -142,7 +143,7 @@ public:
 
         // 读取TLE数据
         cTLE2PosVel tleProcessor;
-        std::vector<stSatelliteIOE> ioes;
+        std::vector<SatelliteIOE> ioes;
         if (!tleProcessor.ReadAllTLE(ioes, config_.tleFilePath.c_str())) {
             std::cerr << "Error: Failed to read TLE file: " << config_.tleFilePath << std::endl;
             return results;
@@ -161,14 +162,14 @@ public:
         const CartesianPosition siteECEF = site_.toECEF();
 
         // 确定起始时间
-        double startJD = config_.startJD > 0.0 ? config_.startJD : ioes[0].GetRefJD();
+        double startJD = config_.startJD > 0.0 ? config_.startJD : ioes[0].getRefJD();
         double endJD = startJD + config_.endJD;
 
         std::cout << "Processing satellite pass prediction..." << std::endl;
         std::cout << "Time range: " << std::format("JD {:.6f}", startJD)
                   << " to " << std::format("JD {:.6f}", endJD) << std::endl;
-        std::cout << "Site: Lat=" << std::format("{:.6f}", site_.latitude * RAD2DEG)
-                  << " deg, Lon=" << std::format("{:.6f}", site_.longitude * RAD2DEG) << " deg" << std::endl;
+        std::cout << "Site: Lat=" << std::format("{:.6f}", site_.latitude * g_Constants::RAD2DEG)
+                  << " deg, Lon=" << std::format("{:.6f}", site_.longitude * g_Constants::RAD2DEG) << " deg" << std::endl;
         std::cout << std::endl;
 
         // 时间步进计算
@@ -208,21 +209,16 @@ public:
             return false;
         }
 
-        outFile << std::format("{:<20} {:<18} {:>4} {:>2} {:>2} {:>2} {:>2} {:>8.3f}  "
-                              "{:<10} {:>10.4f}  {:<10} {:>10.4f}\n",
-                              "JuliusDate", "TimeUTC",
-                              "Year", "Month", "Day", "Hour", "Minute", "Second",
-                              "Elevation", "deg", "Azimuth", "deg");
+        outFile << "JuliusDate           TimeUTC            Year Month Day Hour Minute Second  Elevation      deg  Azimuth       deg\n";
 
         for (const auto& result : results) {
-            outFile << std::format("{:<20.10f} {:<18} {:>4} {:>2} {:>2} {:>2} {:>2} {:>8.3f}  "
-                                  "{:<10} {:>10.4f}  {:<10} {:>10.4f}\n",
+            outFile << std::format("{:<20.10f} {:<18} {:>4} {:>5} {:>3} {:>4} {:>6} {:>8.3f}  Elevation {:>10.4f}  Azimuth  {:>10.4f}\n",
                                   result.julianDate,
                                   "",
                                   result.year, result.month, result.day,
                                   result.hour, result.minute, result.second,
-                                  "", result.elevation * RAD2DEG,
-                                  "", result.azimuth * RAD2DEG);
+                                  result.elevation * g_Constants::RAD2DEG,
+                                  result.azimuth * g_Constants::RAD2DEG);
         }
 
         outFile.close();
@@ -257,7 +253,7 @@ private:
         // 转换时间
         int year, month, day, hour, minute;
         double second;
-        DateTimeZ jdConverter;
+        cDateTimeZ jdConverter;
         jdConverter.JD2DateTime(jd, year, month, day, hour, minute, second);
 
         return ObservationResult{
@@ -281,8 +277,8 @@ void printResultsTraditional(const std::vector<SatellitePassPredictor::Observati
                result.julianDate,
                result.year, result.month, result.day,
                result.hour, result.minute, result.second,
-               result.elevation * RAD2DEG,
-               result.azimuth * RAD2DEG);
+               result.elevation * g_Constants::RAD2DEG,
+               result.azimuth * g_Constants::RAD2DEG);
     }
 }
 
@@ -302,8 +298,8 @@ public:
     {
         // 示例：北纬32.656465度，东经110.745166度
         return {
-            32.656465 * DEG2RAD,
-            110.745166 * DEG2RAD,
+            32.656465 * g_Constants::DEG2RAD,
+            110.745166 * g_Constants::DEG2RAD,
             0.0
         };
     }
@@ -316,8 +312,8 @@ public:
         double lonDeg, double lonMin, double lonSec,
         double height = 0.0)
     {
-        const double latitude = (latDeg + latMin / 60.0 + latSec / 3600.0) * DEG2RAD;
-        const double longitude = (lonDeg + lonMin / 60.0 + lonSec / 3600.0) * DEG2RAD;
+        const double latitude = (latDeg + latMin / 60.0 + latSec / 3600.0) * g_Constants::DEG2RAD;
+        const double longitude = (lonDeg + lonMin / 60.0 + lonSec / 3600.0) * g_Constants::DEG2RAD;
         return {latitude, longitude, height};
     }
 };

@@ -13,7 +13,7 @@
 
 #include <math.h>
 
-#include "constant.h"
+#include "Constant.h"
 
 #include "DateTimeZ.h"
 
@@ -44,16 +44,16 @@ cDateTimeZ::~cDateTimeZ()
 
 **************************************************************************************************/
 
-BOOL cDateTimeZ::DateTime2JD( int nYear, int nMonth, int nDay, 
+bool cDateTimeZ::DateTime2JD( int nYear, int nMonth, int nDay, 
 							  int nHour, int nMinute, double dfSecond,
 	                          double &dfJD )
 {
-//	if( nYear < 1900 || nYear > 2100 ) return FALSE;
-//	if( nMonth < 1 || nMonth > 12 ) return FALSE;
-//	if( nDay < 1 || nDay > 366 ) return FALSE;
-//	if( nHour < 0 || nHour > 720 ) return FALSE;
-//	if( nMinute < 0 || nMinute > 1440 ) return FALSE;
-//	if( dfSecond < 0.0 || dfSecond > 86400.0 ) return FALSE;
+//	if( nYear < 1900 || nYear > 2100 ) return false;
+//	if( nMonth < 1 || nMonth > 12 ) return false;
+//	if( nDay < 1 || nDay > 366 ) return false;
+//	if( nHour < 0 || nHour > 720 ) return false;
+//	if( nMinute < 0 || nMinute > 1440 ) return false;
+//	if( dfSecond < 0.0 || dfSecond > 86400.0 ) return false;
 
 	int nJD =  367 * nYear - 
 	           7 * ( nYear + ( nMonth + 9 ) / 12 ) / 4 +
@@ -63,7 +63,7 @@ BOOL cDateTimeZ::DateTime2JD( int nYear, int nMonth, int nDay,
 
 	dfJD = (double) nJD + dfRealDay;
 
-	return TRUE;
+	return true;
 
 }
 
@@ -83,19 +83,19 @@ BOOL cDateTimeZ::DateTime2JD( int nYear, int nMonth, int nDay,
 
 **************************************************************************************************/
 
-BOOL cDateTimeZ::DateTime2JD( int nYear, int nMonth, int nDay, 
+bool cDateTimeZ::DateTime2JD( int nYear, int nMonth, int nDay, 
 							  int nHour, int nMinute, double dfSecond,
 	                          double &dfIntJD, double &dfFractionJD )
 {
 	double dfJD;
 
-	if( !DateTime2JD( nYear, nMonth, nDay, nHour, nMinute, dfSecond, dfJD ) ) return FALSE;
+	if( !DateTime2JD( nYear, nMonth, nDay, nHour, nMinute, dfSecond, dfJD ) ) return false;
 
 	m_dfIntJD = dfIntJD = (double) ( (int) dfJD);
 
 	m_dfFractionJD = dfFractionJD = dfJD - dfIntJD;
 
-	return TRUE;
+	return true;
 
 }
 
@@ -114,7 +114,7 @@ BOOL cDateTimeZ::DateTime2JD( int nYear, int nMonth, int nDay,
 
 **************************************************************************************************/
 
-BOOL cDateTimeZ::JD2DateTime( double dfJD,
+bool cDateTimeZ::JD2DateTime( double dfJD,
 	                          int &nYear, int &nMonth, int &nDay, 
 							  int &nHour, int &nMinute, double &dfSecond )
 {
@@ -122,7 +122,7 @@ BOOL cDateTimeZ::JD2DateTime( double dfJD,
 	{
 		//MessageBox( NULL, "Time out of year 1900-2100", 
 		//	        "JD2DateTime in DateTimeZ", MB_OK | MB_ICONHAND );
-		return FALSE;
+		return false;
 	}
 	
 	double t1, t2, t3, t4, date_mjd, day_real;
@@ -184,7 +184,7 @@ BOOL cDateTimeZ::JD2DateTime( double dfJD,
 	m_nMinute = nMinute;
 	m_dfSecond = dfSecond;
 
-	return TRUE;
+	return true;
 }
 
 /*************************************************************************************************
@@ -203,15 +203,15 @@ BOOL cDateTimeZ::JD2DateTime( double dfJD,
 
 **************************************************************************************************/
 
-BOOL cDateTimeZ::JD2DateTime( double dfIntJD, double dfFractionJD,
+bool cDateTimeZ::JD2DateTime( double dfIntJD, double dfFractionJD,
 	                          int &nYear, int &nMonth, int &nDay, 
 							  int &nHour, int &nMinute, double &dfSecond )
 {
 	double dfJD = dfIntJD + dfFractionJD;
 
-	if( !JD2DateTime( dfJD, nYear, nMonth, nDay, nHour, nMinute, dfSecond ) ) return FALSE;
+	if( !JD2DateTime( dfJD, nYear, nMonth, nDay, nHour, nMinute, dfSecond ) ) return false;
 
-	return TRUE;
+	return true;
 }
 
 /*************************************************************************************************
@@ -224,12 +224,12 @@ BOOL cDateTimeZ::JD2DateTime( double dfIntJD, double dfFractionJD,
   dfIntMJD: the integer part of the computed Modified Julian Date
   dfFractionMJD: the fractional part of the computed Modified Julian Date
 
-  bJD2MJD: TRUE for converting from JD to MJD, FALSE from MJD to JD
+  bJD2MJD: true for converting from JD to MJD, false from MJD to JD
 
 **************************************************************************************************/
 
-BOOL cDateTimeZ::ConversionJDMJD( double &dfIntJD,  double &dfFractionJD, 
-		                          double &dfIntMJD, double &dfFractionMJD, BOOL bJD2MJD )
+bool cDateTimeZ::ConversionJDMJD( double &dfIntJD,  double &dfFractionJD, 
+		                          double &dfIntMJD, double &dfFractionMJD, bool bJD2MJD )
 {
 	if( bJD2MJD )	// from JD to MJD
 	{
@@ -258,7 +258,7 @@ BOOL cDateTimeZ::ConversionJDMJD( double &dfIntJD,  double &dfFractionJD,
 		m_dfFractionJD = dfFractionJD;
 	}
 
-	return TRUE;
+	return true;
 }
 
 /*************************************************************************************************
@@ -271,12 +271,12 @@ BOOL cDateTimeZ::ConversionJDMJD( double &dfIntJD,  double &dfFractionJD,
   dfIntSec: the integer part of the seconds since the reference epoch
   dfFractionMJD: the fractional part of the seconds since the reference epoch
 
-  bJD2MJD: TRUE for converting from JD to Second of Time, FALSE from Second of Time to JD
+  bJD2MJD: true for converting from JD to Second of Time, false from Second of Time to JD
 
 **************************************************************************************************/
 
-BOOL cDateTimeZ::ConversionJDSecond( double &dfIntJD,  double &dfFractionJD, 
-		                             double &dfIntSec, double &dfFractionSec, BOOL bJD2Second )
+bool cDateTimeZ::ConversionJDSecond( double &dfIntJD,  double &dfFractionJD, 
+		                             double &dfIntSec, double &dfFractionSec, bool bJD2Second )
 {
 	if( bJD2Second ) // from JD to Second
 	{
@@ -302,7 +302,7 @@ BOOL cDateTimeZ::ConversionJDSecond( double &dfIntJD,  double &dfFractionJD,
 		m_dfFractionJD = dfFractionJD;
 	}
 
-	return TRUE;
+	return true;
 }
 
 /*************************************************************************************************
@@ -314,12 +314,12 @@ BOOL cDateTimeZ::ConversionJDSecond( double &dfIntJD,  double &dfFractionJD,
   dfIntSec: the integer part of the seconds since the reference epoch
   dfFractionMJD: the fractional part of the seconds since the reference epoch
 
-  bJD2MJD: TRUE for converting from JD to Second of Time, FALSE from Second of Time to JD
+  bJD2MJD: true for converting from JD to Second of Time, false from Second of Time to JD
 
 **************************************************************************************************/
 
-BOOL cDateTimeZ::ConversionJDSecond( double &dfJD, 
-									 double &dfIntSec, double &dfFractionSec, BOOL bJD2Second )
+bool cDateTimeZ::ConversionJDSecond( double &dfJD, 
+									 double &dfIntSec, double &dfFractionSec, bool bJD2Second )
 {
 	double dfIntJD, dfFractionJD;
 	if( bJD2Second ) // from JD to Second
@@ -351,7 +351,7 @@ BOOL cDateTimeZ::ConversionJDSecond( double &dfJD,
 		dfJD = dfIntJD + dfFractionJD;
 	}
 
-	return TRUE;
+	return true;
 }
 
 
@@ -413,64 +413,64 @@ void cDateTimeZ::ReConstruct( double &dfInt, double &dfFraction )
 
 *****************************************************************************/
 
-BOOL cDateTimeZ::ComputeDayOfYearFromDate( int nYear, int nMonth, int nDay, int &nDoY )
+bool cDateTimeZ::ComputeDayOfYearFromDate( int nYear, int nMonth, int nDay, int &nDoY )
 {
-	if( abs( nYear - 2000 ) > 100 ) return FALSE;
+	if( abs( nYear - 2000 ) > 100 ) return false;
 
-	if( nMonth < 1 || nMonth > 12 ) return FALSE;
+	if( nMonth < 1 || nMonth > 12 ) return false;
 	
-	if( nDay < 1 || nDay > 366 ) return FALSE;
+	if( nDay < 1 || nDay > 366 ) return false;
 
 //	day in january
 	nDoY = nDay;
-	if( nMonth <= 1 ) return TRUE;
+	if( nMonth <= 1 ) return true;
 
 //  day in february
   
     nDoY += 31;
-	if( nMonth <= 2 ) return TRUE;
+	if( nMonth <= 2 ) return true;
 
 //  day in march
 	if( nYear / 4 * 4 == nYear ) nDoY += 29;
     else nDoY += 28;
-	if( nMonth <= 3 ) return TRUE;
+	if( nMonth <= 3 ) return true;
 
 //  day in april
     nDoY += 31;
-	if( nMonth <= 4 ) return TRUE;
+	if( nMonth <= 4 ) return true;
 
 //  day in may
     nDoY += 30;
-	if( nMonth <= 5 ) return TRUE;
+	if( nMonth <= 5 ) return true;
 
 //  day in june
     nDoY += 31;
-	if( nMonth <= 6 ) return TRUE;
+	if( nMonth <= 6 ) return true;
 
 //  day in July
     nDoY += 30;
-	if( nMonth <= 7 ) return TRUE;
+	if( nMonth <= 7 ) return true;
 
 //  day in august
     nDoY += 31;
-	if( nMonth <= 8 ) return TRUE;
+	if( nMonth <= 8 ) return true;
 
 //  day in september
     nDoY += 31;
-	if( nMonth <= 9 ) return TRUE;
+	if( nMonth <= 9 ) return true;
 
 //  day in october
     nDoY += 30;
-	if( nMonth <= 10 ) return TRUE;
+	if( nMonth <= 10 ) return true;
 
 //  day in november
     nDoY += 31;
-	if( nMonth <= 11 ) return TRUE;
+	if( nMonth <= 11 ) return true;
 
 //  day in december
 	nDoY += 30;
 	
-	return TRUE;
+	return true;
 }
 
 /*************************************************************************************************
@@ -478,7 +478,7 @@ BOOL cDateTimeZ::ComputeDayOfYearFromDate( int nYear, int nMonth, int nDay, int 
 
 **************************************************************************************************/
 
-BOOL cDateTimeZ::ConversionJDMJD( BOOL bJD2MJD )
+bool cDateTimeZ::ConversionJDMJD( bool bJD2MJD )
 {
 	if( bJD2MJD )	// from JD to MJD
 	{
@@ -495,7 +495,7 @@ BOOL cDateTimeZ::ConversionJDMJD( BOOL bJD2MJD )
 		ReConstruct( m_dfIntJD, m_dfFractionJD );
 	}
 
-	return TRUE;
+	return true;
 }
 
 /*************************************************************************************************
@@ -503,7 +503,7 @@ BOOL cDateTimeZ::ConversionJDMJD( BOOL bJD2MJD )
 
 **************************************************************************************************/
 
-BOOL cDateTimeZ::ConversionJDSecond( BOOL bJD2Second )
+bool cDateTimeZ::ConversionJDSecond( bool bJD2Second )
 {
 	if( bJD2Second ) // from JD to Second
 	{
@@ -523,7 +523,7 @@ BOOL cDateTimeZ::ConversionJDSecond( BOOL bJD2Second )
 		ReConstruct( m_dfIntJD, m_dfFractionJD );
 	}
 
-	return TRUE;
+	return true;
 }
 
 /*************************************************************************************************
@@ -537,12 +537,12 @@ BOOL cDateTimeZ::ConversionJDSecond( BOOL bJD2Second )
 
 **************************************************************************************************/
 
-BOOL cDateTimeZ::ComputeLocalHour( double dfJD, double dfLongitude, double &dfLocalHour, int &nDoY )
+bool cDateTimeZ::ComputeLocalHour( double dfJD, double dfLongitude, double &dfLocalHour, int &nDoY )
 {
 	int nYear, nMonth, nDay, nHour, nMinute;
 	double dfSecond;
 
-	if( !JD2DateTime( dfJD, nYear, nMonth, nDay, nHour, nMinute, dfSecond ) ) return FALSE;
+	if( !JD2DateTime( dfJD, nYear, nMonth, nDay, nHour, nMinute, dfSecond ) ) return false;
 
 	dfLocalHour = (double) nHour * 3600.0 + (double) nMinute * 60.0 + dfSecond;
 
@@ -554,7 +554,7 @@ BOOL cDateTimeZ::ComputeLocalHour( double dfJD, double dfLongitude, double &dfLo
 
 	ComputeDayOfYearFromDate( nYear, nMonth, nDay, nDoY );
 
-	return TRUE;
+	return true;
 }
 
 /*************************************************************************************************
@@ -563,27 +563,27 @@ BOOL cDateTimeZ::ComputeLocalHour( double dfJD, double dfLongitude, double &dfLo
 
 **************************************************************************************************/
 
-BOOL cDateTimeZ::ComputeDayOfYearFromJD( double dfJD, int &nDoY )
+bool cDateTimeZ::ComputeDayOfYearFromJD( double dfJD, int &nDoY )
 {
 	int nYear, nMonth, nDay, nHour, nMinute;
 	double dfSecond;
 
-	if( !JD2DateTime( dfJD, nYear, nMonth, nDay, nHour, nMinute, dfSecond ) ) return FALSE;
+	if( !JD2DateTime( dfJD, nYear, nMonth, nDay, nHour, nMinute, dfSecond ) ) return false;
 
 	ComputeDayOfYearFromDate( nYear, nMonth, nDay, nDoY );
 
-	return TRUE;
+	return true;
 }
 
 /*************************************************************************************************
 
   Convert between the bessilan year and julian date
 
-  bB2J: TRUE conversion from besselian year to Julian date, 
-        FALSE conversion from Julian date to Besselian year 
+  bB2J: true conversion from besselian year to Julian date, 
+        false conversion from Julian date to Besselian year 
 
 **************************************************************************************************/
-BOOL cDateTimeZ::ConversionBesselianYearJulianDate( double &dfBesselianYear, double &dfJD, BOOL bB2J )
+bool cDateTimeZ::ConversionBesselianYearJulianDate( double &dfBesselianYear, double &dfJD, bool bB2J )
 {
 	double dfD1900 = 1900.0;
 	double dfBYR00 = 2415020.31352;	// Julian date of Besselian Yaer 1900.0
@@ -607,7 +607,7 @@ BOOL cDateTimeZ::ConversionBesselianYearJulianDate( double &dfBesselianYear, dou
 		dfBesselianYear = D / ( dfDays + dfDDays * dfBesselianYear ) + dfD1900;
 	}
 
-	return TRUE;
+	return true;
 }
 
 /******************************************************************************
