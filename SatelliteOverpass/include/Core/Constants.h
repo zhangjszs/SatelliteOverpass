@@ -69,7 +69,7 @@ namespace Physics
     constexpr double ASTRONOMICAL_UNIT_METER = 149597870691.0;
 
     constexpr double OBLIQUITY_J2000_SEC = 84381.412;
-    constexpr double OBLIQUITY_J2000_RAD = OBLIQUITY_J2000_SEC * SEC_TO_RAD;
+    constexpr double OBLIQUITY_J2000_RAD = OBLIQUITY_J2000_SEC * Angle::SEC_TO_RAD;
 }
 
 /**
@@ -144,26 +144,26 @@ namespace Geopotential
 }
 
 /**
- * @brief 类型别名定义
+ * @brief 常量别名定义
  */
-using PI = Angle::PI;
-using TWO_PI = Angle::TWO_PI;
-using HALF_PI = Angle::HALF_PI;
-using DEG2RAD = Angle::DEG_TO_RAD;
-using RAD2DEG = Angle::RAD_TO_DEG;
-using SEC2RAD = Angle::SEC_TO_RAD;
-using RAD2SEC = Angle::RAD_TO_SEC;
+constexpr double PI = Angle::PI;
+constexpr double TWO_PI = Angle::TWO_PI;
+constexpr double HALF_PI = Angle::HALF_PI;
+constexpr double DEG2RAD = Angle::DEG_TO_RAD;
+constexpr double RAD2DEG = Angle::RAD_TO_DEG;
+constexpr double SEC2RAD = Angle::SEC_TO_RAD;
+constexpr double RAD2SEC = Angle::RAD_TO_SEC;
 
-using J2000 = Time::J2000;
-using MJD_REF = Time::MJD_REF;
+constexpr double J2000 = Time::J2000;
+constexpr double MJD_REF = Time::MJD_REF;
 
-using EARTH_SEMI_MAJOR = Earth::SEMI_MAJOR;
-using EARTH_FLATTENING = Earth::FLATTENING;
-using EARTH_ECCENTRICITY = Earth::ECCENTRICITY;
-using EARTH_GM = Earth::GM;
-using EARTH_ANGULAR_VELOCITY = Earth::ANGULAR_VELOCITY;
+constexpr double EARTH_SEMI_MAJOR = Earth::SEMI_MAJOR;
+constexpr double EARTH_FLATTENING = Earth::FLATTENING;
+constexpr double EARTH_ECCENTRICITY = Earth::ECCENTRICITY;
+constexpr double EARTH_GM = Earth::GM;
+constexpr double EARTH_ANGULAR_VELOCITY = Earth::ANGULAR_VELOCITY;
 
-using LIGHT_SPEED = Physics::LIGHT_SPEED;
+constexpr double LIGHT_SPEED = Physics::LIGHT_SPEED;
 
 } // namespace SatelliteOverpass::Constants
 

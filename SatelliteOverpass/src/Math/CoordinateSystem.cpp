@@ -55,8 +55,15 @@ CartesianPosition CoordinateConverter::toCartesian(const GeodeticPosition& geode
     }
 
     CartesianPosition result;
-    convertXYZ2BLH(geodetic.latitude, geodetic.longitude, geodetic.height,
-                   result.x, result.y, result.z, false);
+    const double sb = std::sin(geodetic.latitude);
+    const double cb = std::cos(geodetic.latitude);
+    const double sl = std::sin(geodetic.longitude);
+    const double cl = std::cos(geodetic.longitude);
+    const double an = semiMajor_ / std::sqrt(1.0 - eccentricity_ * sb * sb);
+
+    result.x = (an + geodetic.height) * cb * cl;
+    result.y = (an + geodetic.height) * cb * sl;
+    result.z = (an * (1.0 - eccentricity_) + geodetic.height) * sb;
 
     return result;
 }
