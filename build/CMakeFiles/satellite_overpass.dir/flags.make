@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/workspace/SatelliteOverpass/include
+CXX_INCLUDES = -I/workspace/SatelliteOverpass/include -I/workspace/SatelliteOverpass/src
 
-CXX_FLAGS = -std=c++20 -Wall -Wextra -Wpedantic
+CXX_FLAGS = -std=c++20
 

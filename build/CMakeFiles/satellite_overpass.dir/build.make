@@ -69,10 +69,24 @@ include CMakeFiles/satellite_overpass.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/satellite_overpass.dir/flags.make
 
+CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Math/CholeskyDecomposition.cpp.o: CMakeFiles/satellite_overpass.dir/flags.make
+CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Math/CholeskyDecomposition.cpp.o: /workspace/SatelliteOverpass/src/Math/CholeskyDecomposition.cpp
+CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Math/CholeskyDecomposition.cpp.o: CMakeFiles/satellite_overpass.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Math/CholeskyDecomposition.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Math/CholeskyDecomposition.cpp.o -MF CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Math/CholeskyDecomposition.cpp.o.d -o CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Math/CholeskyDecomposition.cpp.o -c /workspace/SatelliteOverpass/src/Math/CholeskyDecomposition.cpp
+
+CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Math/CholeskyDecomposition.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Math/CholeskyDecomposition.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /workspace/SatelliteOverpass/src/Math/CholeskyDecomposition.cpp > CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Math/CholeskyDecomposition.cpp.i
+
+CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Math/CholeskyDecomposition.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Math/CholeskyDecomposition.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /workspace/SatelliteOverpass/src/Math/CholeskyDecomposition.cpp -o CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Math/CholeskyDecomposition.cpp.s
+
 CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Math/CoordinateSystem.cpp.o: CMakeFiles/satellite_overpass.dir/flags.make
 CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Math/CoordinateSystem.cpp.o: /workspace/SatelliteOverpass/src/Math/CoordinateSystem.cpp
 CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Math/CoordinateSystem.cpp.o: CMakeFiles/satellite_overpass.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Math/CoordinateSystem.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Math/CoordinateSystem.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Math/CoordinateSystem.cpp.o -MF CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Math/CoordinateSystem.cpp.o.d -o CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Math/CoordinateSystem.cpp.o -c /workspace/SatelliteOverpass/src/Math/CoordinateSystem.cpp
 
 CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Math/CoordinateSystem.cpp.i: cmake_force
@@ -83,17 +97,83 @@ CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Math/CoordinateSystem.cp
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Math/CoordinateSystem.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /workspace/SatelliteOverpass/src/Math/CoordinateSystem.cpp -o CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Math/CoordinateSystem.cpp.s
 
+CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Orbit/TLE2PosVel.cpp.o: CMakeFiles/satellite_overpass.dir/flags.make
+CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Orbit/TLE2PosVel.cpp.o: /workspace/SatelliteOverpass/src/Orbit/TLE2PosVel.cpp
+CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Orbit/TLE2PosVel.cpp.o: CMakeFiles/satellite_overpass.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Orbit/TLE2PosVel.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Orbit/TLE2PosVel.cpp.o -MF CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Orbit/TLE2PosVel.cpp.o.d -o CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Orbit/TLE2PosVel.cpp.o -c /workspace/SatelliteOverpass/src/Orbit/TLE2PosVel.cpp
+
+CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Orbit/TLE2PosVel.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Orbit/TLE2PosVel.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /workspace/SatelliteOverpass/src/Orbit/TLE2PosVel.cpp > CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Orbit/TLE2PosVel.cpp.i
+
+CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Orbit/TLE2PosVel.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Orbit/TLE2PosVel.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /workspace/SatelliteOverpass/src/Orbit/TLE2PosVel.cpp -o CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Orbit/TLE2PosVel.cpp.s
+
+CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Orbit/TwoBody.cpp.o: CMakeFiles/satellite_overpass.dir/flags.make
+CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Orbit/TwoBody.cpp.o: /workspace/SatelliteOverpass/src/Orbit/TwoBody.cpp
+CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Orbit/TwoBody.cpp.o: CMakeFiles/satellite_overpass.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Orbit/TwoBody.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Orbit/TwoBody.cpp.o -MF CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Orbit/TwoBody.cpp.o.d -o CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Orbit/TwoBody.cpp.o -c /workspace/SatelliteOverpass/src/Orbit/TwoBody.cpp
+
+CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Orbit/TwoBody.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Orbit/TwoBody.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /workspace/SatelliteOverpass/src/Orbit/TwoBody.cpp > CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Orbit/TwoBody.cpp.i
+
+CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Orbit/TwoBody.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Orbit/TwoBody.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /workspace/SatelliteOverpass/src/Orbit/TwoBody.cpp -o CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Orbit/TwoBody.cpp.s
+
+CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/SatelliteOverpassModern.cpp.o: CMakeFiles/satellite_overpass.dir/flags.make
+CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/SatelliteOverpassModern.cpp.o: /workspace/SatelliteOverpass/src/SatelliteOverpassModern.cpp
+CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/SatelliteOverpassModern.cpp.o: CMakeFiles/satellite_overpass.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/SatelliteOverpassModern.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/SatelliteOverpassModern.cpp.o -MF CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/SatelliteOverpassModern.cpp.o.d -o CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/SatelliteOverpassModern.cpp.o -c /workspace/SatelliteOverpass/src/SatelliteOverpassModern.cpp
+
+CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/SatelliteOverpassModern.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/SatelliteOverpassModern.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /workspace/SatelliteOverpass/src/SatelliteOverpassModern.cpp > CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/SatelliteOverpassModern.cpp.i
+
+CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/SatelliteOverpassModern.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/SatelliteOverpassModern.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /workspace/SatelliteOverpass/src/SatelliteOverpassModern.cpp -o CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/SatelliteOverpassModern.cpp.s
+
+CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Time/GreenwichSiderealTime.cpp.o: CMakeFiles/satellite_overpass.dir/flags.make
+CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Time/GreenwichSiderealTime.cpp.o: /workspace/SatelliteOverpass/src/Time/GreenwichSiderealTime.cpp
+CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Time/GreenwichSiderealTime.cpp.o: CMakeFiles/satellite_overpass.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Time/GreenwichSiderealTime.cpp.o"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Time/GreenwichSiderealTime.cpp.o -MF CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Time/GreenwichSiderealTime.cpp.o.d -o CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Time/GreenwichSiderealTime.cpp.o -c /workspace/SatelliteOverpass/src/Time/GreenwichSiderealTime.cpp
+
+CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Time/GreenwichSiderealTime.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Time/GreenwichSiderealTime.cpp.i"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /workspace/SatelliteOverpass/src/Time/GreenwichSiderealTime.cpp > CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Time/GreenwichSiderealTime.cpp.i
+
+CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Time/GreenwichSiderealTime.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Time/GreenwichSiderealTime.cpp.s"
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /workspace/SatelliteOverpass/src/Time/GreenwichSiderealTime.cpp -o CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Time/GreenwichSiderealTime.cpp.s
+
 # Object files for target satellite_overpass
 satellite_overpass_OBJECTS = \
-"CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Math/CoordinateSystem.cpp.o"
+"CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Math/CholeskyDecomposition.cpp.o" \
+"CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Math/CoordinateSystem.cpp.o" \
+"CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Orbit/TLE2PosVel.cpp.o" \
+"CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Orbit/TwoBody.cpp.o" \
+"CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/SatelliteOverpassModern.cpp.o" \
+"CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Time/GreenwichSiderealTime.cpp.o"
 
 # External object files for target satellite_overpass
 satellite_overpass_EXTERNAL_OBJECTS =
 
+lib/libsatellite_overpass.a: CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Math/CholeskyDecomposition.cpp.o
 lib/libsatellite_overpass.a: CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Math/CoordinateSystem.cpp.o
+lib/libsatellite_overpass.a: CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Orbit/TLE2PosVel.cpp.o
+lib/libsatellite_overpass.a: CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Orbit/TwoBody.cpp.o
+lib/libsatellite_overpass.a: CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/SatelliteOverpassModern.cpp.o
+lib/libsatellite_overpass.a: CMakeFiles/satellite_overpass.dir/SatelliteOverpass/src/Time/GreenwichSiderealTime.cpp.o
 lib/libsatellite_overpass.a: CMakeFiles/satellite_overpass.dir/build.make
 lib/libsatellite_overpass.a: CMakeFiles/satellite_overpass.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX static library lib/libsatellite_overpass.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/workspace/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking CXX static library lib/libsatellite_overpass.a"
 	$(CMAKE_COMMAND) -P CMakeFiles/satellite_overpass.dir/cmake_clean_target.cmake
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/satellite_overpass.dir/link.txt --verbose=$(VERBOSE)
 

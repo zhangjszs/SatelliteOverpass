@@ -6,8 +6,6 @@
 ***************************************************************************************/
 #pragma once
 
-#include <windows.h>
-
 class cCholeskyDecom
 {
 public:
@@ -15,12 +13,10 @@ public:
 	cCholeskyDecom();
 	~cCholeskyDecom();
 
-	BOOL Decompose( double *pdfMatrix, int nDim );
-	BOOL Decompose( double *pdfMatrix, int nDim, int nDim0 );
-	BOOL LinearEquation( double *pdfMatrix, double *pdfB, int nDim, double *pdfX );
-	BOOL InverseLowTriangular( double *pdfMatrix, int nDim );
-	BOOL MatrixInversing( double *pdfMatrix, int nDim, int nCase );
-	BOOL MatrixInversing( double *pdfMatrix, int nDim, int nDim0, int nCase );
+	bool Decompose( double *pdfMatrix, int nDim );
+	bool Decompose( double *pdfMatrix, int nDim, int nDim0 );
+	bool LinearEquation( double *pdfMatrix, double *pdfB, int nDim, double *pdfX );
+	bool InverseLowTriangular( double *pdfMatrix, int nDim );
+	bool MatrixInversing( double *pdfMatrix, int nDim, int nCase );
+	bool MatrixInversing( double *pdfMatrix, int nDim, int nDim0, int nCase );
 };
-
-#endif

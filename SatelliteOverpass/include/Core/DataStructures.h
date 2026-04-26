@@ -19,7 +19,10 @@
 #include <string>
 #include <stdio.h>
 #include <vector>
-#include <math.h>
+#include <cmath>
+
+// 定义常量
+constexpr int MAX_PATH = 260;
 
 /***********************************************************************************
 
@@ -32,7 +35,7 @@ struct stTrackStation
 	double dfSinLat, dfCosLat;					
 	double dfECEFX, dfECEFY, dfECEFZ;			// in meter
 
-	char szName[ _MAX_PATH ];
+	char szName[ MAX_PATH ];
 	int nSiteNo;
 
 	// 1 for Laser 
@@ -49,7 +52,7 @@ struct stTrackStation
 struct stStationStatus
 {
 	int nStationID;
-	BOOL bAvailable;
+	bool bAvailable;
 	double dfJDBegin, dfJDEnd;
 
 	// unavailability code, for example, 
@@ -73,7 +76,7 @@ struct stStationStatus
 
 struct stVisibilityCondition
 {
-	BOOL bSun;				// TRUE if the sun illumination is required
+	bool bSun;				// TRUE if the sun illumination is required
 
 	double dfElevationMask;	// in radian
 	double dfZenithMask;	// 90 degree - dfElevationMask
@@ -113,7 +116,7 @@ struct stVisiblePass
 	stPassPoint tRise, tSet, tTCA;
 
 	// sun lit data
-	BOOL bSunLit;
+	bool bSunLit;
 
 	stPassPoint tSunLitRise, tSunLitSet, tSunLitMid;
 
@@ -154,10 +157,10 @@ struct stDarkTime
 
 struct stVisComControl
 {
-	BOOL bInit;
+	bool bInit;
 
-	char szStationDataFile[ _MAX_PATH ];
-	char szSatelliteDataFile[ _MAX_PATH ];
+	char szStationDataFile[ MAX_PATH ];
+	char szSatelliteDataFile[ MAX_PATH ];
 
 	// start date/time and prediction period of time
 	int nYear, nMonth, nDay, nHour;	// in UTC
@@ -166,15 +169,15 @@ struct stVisComControl
 	double dfJDEnd;		// dfJDBegin + dfPredictionDas	in UTC
 	
 	// gravity model
-	char szGravityFile[ _MAX_PATH ];
-	char szGravityModel[ _MAX_PATH ];
+	char szGravityFile[ MAX_PATH ];
+	char szGravityModel[ MAX_PATH ];
 	int nMaxGravityDegree;
 
 	// Initial Orbital Elements (IOE)
-	int nIOEType;	// 1 for IRV, 2 for TLE, 3 for EOSMOE
-	char szIOEFile[ _MAX_PATH ];
+	int nIOEType; // 1 for IRV, 2 for TLE, 3 for EOSMOE
+	char szIOEFile[ MAX_PATH ];
 
-	char szCatalogFile[ _MAX_PATH ];
+	char szCatalogFile[ MAX_PATH ];
 
 	// visibility condition
 	stVisibilityCondition stVisibility;
@@ -450,11 +453,11 @@ struct stInternalIRV
 
 struct stElementConversionControl
 {
-	char nSourceType;	// 1 for IRV, 2 for TLE, 3 for EOSMOE
-	char szSourceFile[ _MAX_PATH ];
+	char nSourceType; // 1 for IRV, 2 for TLE, 3 for EOSMOE
+	char szSourceFile[ MAX_PATH ];
 
 	char nResultType;
-	char szResultFile[ _MAX_PATH ];
+	char szResultFile[ MAX_PATH ];
 
 	// reference epoch
 	int nYear, nMonth, nDay, nHour;	// in UTC

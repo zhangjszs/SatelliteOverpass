@@ -6,27 +6,27 @@
 ***************************************************************************************/
 #pragma once
 
-#include <windows.h>
+#include <cmath>
 
-class cGreenwichST
+namespace SatelliteOverpass::Time
 {
-public:
+    class GreenwichSiderealTime
+    {
+    public:
+        GreenwichSiderealTime() = default;
+        ~GreenwichSiderealTime() = default;
 
-	cGreenwichST();
-	~cGreenwichST();
+        static double ComputeGST(double dfTJD);
 
-	static double ComputeGST( double dfTJD );
-
-	static BOOL ComputeGST( double dfIntJD, double dfFractionJD, 
-		                    double dfEquinoxEquation,  double &dfGST );
-	static BOOL ComputeGST( double dfIntJD, double dfFractionJD, 
-		                    double dfEquinoxEquation, double &dfGST,  
-							double &dfSinGST, double &dfCosGST );
-	static BOOL ComputeGSTMatrixECEF2TOD( double dfIntJD, double dfFractionJD, 
-		                                  double dfEquinoxEquation, double *pdfGSTMatrix );
-	static BOOL ComputeGSTMatrixTOD2ECEF( double dfIntJD, double dfFractionJD, 
-		                                  double dfEquinoxEquation, double *pdfGSTMatrix );
-};
-
-#endif
+        static bool ComputeGST(double dfIntJD, double dfFractionJD,
+                              double dfEquinoxEquation, double &dfGST);
+        static bool ComputeGST(double dfIntJD, double dfFractionJD,
+                              double dfEquinoxEquation, double &dfGST,
+                              double &dfSinGST, double &dfCosGST);
+        static bool ComputeGSTMatrixECEF2TOD(double dfIntJD, double dfFractionJD,
+                                            double dfEquinoxEquation, double *pdfGSTMatrix);
+        static bool ComputeGSTMatrixTOD2ECEF(double dfIntJD, double dfFractionJD,
+                                            double dfEquinoxEquation, double *pdfGSTMatrix);
+    };
+}
 

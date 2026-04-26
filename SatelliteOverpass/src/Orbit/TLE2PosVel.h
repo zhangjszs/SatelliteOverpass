@@ -14,12 +14,12 @@
 ***************************************************************************/
 #pragma once
 
-#include <windows.h>
-#include "DataStructure.h"
+#include "../../include/Core/DataStructures.h"
 
 #include <string>
 #include <fstream>
-#include <vector> 
+#include <vector>
+#include <array> 
 
 using namespace std;
 
