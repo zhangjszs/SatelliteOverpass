@@ -1,0 +1,32 @@
+---
+Checks: >
+  -*,
+  bugprone-*,
+  -bugprone-macro-parentheses,
+  -bugprone-narrowing-conversions,
+  -bugprone-easily-swappable-parameters,
+  clang-analyzer-*,
+  cppcoreguidelines-*,
+  -cppcoreguidelines-avoid-magic-numbers,
+  -cppcoreguidelines-non-private-member-variables-in-classes,
+  -cppcoreguidelines-pro-type-reinterpret-cast,
+  performance-*,
+  portability-*,
+  readability-*,
+  -readability-identifier-length,
+  -readability-magic-numbers,
+  modernize-*,
+  -modernize-use-trailing-return-type,
+  -modernize-use-nodiscard,
+  misc-*,
+  -misc-non-private-member-variables-in-classes
+WarningsAsErrors: '*'
+HeaderFilterRegex: '.*'
+FormatStyle: 'file'
+CheckOptions:
+  - key: 'cppcoreguidelines-avoid-magic-numbers.IgnoredFloatingPointValues'
+    value: '0.0,1.0,-1.0,2.0,100.0,180.0,360.0,3.141592653589793'
+  - key: 'cppcoreguidelines-avoid-magic-numbers.IgnoredIntegers'
+    value: '0,1,-1,2,10,100,180,360'
+  - key: 'readability-function-cognitive-complexity.Threshold'
+    value: 25
