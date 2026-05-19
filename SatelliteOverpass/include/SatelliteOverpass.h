@@ -43,6 +43,9 @@
 // 轨道模块
 #include "Orbit/OrbitalElements.h"
 
+// 可视化模块
+#include "Visualization/TerminalVisualizer.h"
+
 /**
  * @namespace SatelliteOverpass
  * @brief 卫星过顶预报系统根命名空间
