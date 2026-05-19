@@ -134,3 +134,6 @@ $RECYCLE.BIN/
 *.tmp
 *.temp
 *.cache
+
+# oh-my-claudecode
+.omc/
