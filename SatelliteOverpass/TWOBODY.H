@@ -88,5 +88,3 @@ public:
 
 	BOOL deltaVEffect( double dxdot, double dydot, char *fileName );
 };
-
-#endif

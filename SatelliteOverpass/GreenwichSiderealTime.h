@@ -28,5 +28,3 @@ public:
 		                                  double dfEquinoxEquation, double *pdfGSTMatrix );
 };
 
-#endif
-

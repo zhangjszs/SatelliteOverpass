@@ -29,13 +29,16 @@
 #include <format>
 #include <numbers>
 
+#include <windows.h>
 #include "ModernConstants.h"
 #include "CoordinateSystem.h"
 #include "DataStructure.h"
 #include "TLE2PosVel.h"
 #include "include/Visualization/TerminalVisualizer.h"
+#include "DateTimeZ.h"
 
 namespace fs = std::filesystem;
+using DateTimeZ = cDateTimeZ;
 using namespace SatelliteOverpass::Constants;
 using namespace SatelliteOverpass::CoordinateSystem;
 using namespace SatelliteOverpass::Visualization;

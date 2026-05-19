@@ -17,6 +17,7 @@
 #include <windows.h>
 #include "DataStructure.h"
 
+#include <array>
 #include <string>
 #include <fstream>
 #include <vector> 

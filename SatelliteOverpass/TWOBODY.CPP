@@ -13,6 +13,7 @@
 #include "twobody.h"
 #include "coortran.h"
 #include "GreenwichSiderealTime.h"
+#include "MATRIX_LEGACY.H"
 #include "constant.h"
 
 cTwoBody::cTwoBody()

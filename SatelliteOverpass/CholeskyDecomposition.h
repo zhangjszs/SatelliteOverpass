@@ -22,5 +22,3 @@ public:
 	BOOL MatrixInversing( double *pdfMatrix, int nDim, int nCase );
 	BOOL MatrixInversing( double *pdfMatrix, int nDim, int nDim0, int nCase );
 };
-
-#endif

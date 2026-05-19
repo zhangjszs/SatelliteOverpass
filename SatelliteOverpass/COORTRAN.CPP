@@ -7,7 +7,7 @@
 
 #include "Constant.h"
 #include "CoorTran.h"
-#include "matrix.h"
+#include "MATRIX_LEGACY.H"
 
 cCoorTrans::cCoorTrans()
 { 

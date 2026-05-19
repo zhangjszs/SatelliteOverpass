@@ -19,13 +19,16 @@
 
 #pragma once
 
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
 #include <array>
 #include <vector>
+#include <string>
 #include <stdexcept>
 #include <cmath>
 #include <algorithm>
 #include <optional>
-#include <numbers>
 
 namespace SatelliteOverpass::Math
 {
@@ -229,7 +232,7 @@ public:
     {
         setZero();
         if constexpr (M == N) {
-            const size_t minSize = std::min(M, N);
+            const size_t minSize = (std::min)(M, N);
             for (size_t i = 0; i < minSize; ++i) {
                 data_[i][i] = T(1);
             }
@@ -596,7 +599,7 @@ public:
             // Jacobi旋转
             T theta = T{};
             if (std::abs(H(p, p) - H(q, q)) < tolerance) {
-                theta = std::numbers::pi / T(4);
+                theta = T(3.14159265358979323846) / T(4);
             } else {
                 theta = T(0.5) * std::atan2(T(2) * H(p, q), H(p, p) - H(q, q));
             }
