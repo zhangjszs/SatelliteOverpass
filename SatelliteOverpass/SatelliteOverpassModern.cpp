@@ -10,10 +10,11 @@
  * - SGP4/SDP4轨道传播模型
  * - 多坐标系支持 (ECEF, BLH, NEU)
  * - 卫星过顶预报和观测数据输出
+ * - 终端可视化输出（天空图、时间线、彩色报表）
  *
  * @author Original: Jizhang Sang (2002)
  * @author Modernized: kerwin_zhang
- * @version 2.0.0
+ * @version 2.1.0
  * @date 2026-02-08
  */
 
@@ -32,10 +33,12 @@
 #include "CoordinateSystem.h"
 #include "DataStructure.h"
 #include "TLE2PosVel.h"
+#include "include/Visualization/TerminalVisualizer.h"
 
 namespace fs = std::filesystem;
 using namespace SatelliteOverpass::Constants;
 using namespace SatelliteOverpass::CoordinateSystem;
+using namespace SatelliteOverpass::Visualization;
 
 /**
  * @class SatellitePassPredictor
@@ -136,62 +139,93 @@ public:
      * @brief 运行预报
      * @return 观测结果列表
      */
-    std::vector<ObservationResult> runPrediction()
+    std::vector<ObservationResult> runPrediction(TerminalVisualizer& visualizer)
     {
         std::vector<ObservationResult> results;
+        allSkyPoints_.clear();
 
-        // 读取TLE数据
         cTLE2PosVel tleProcessor;
         std::vector<stSatelliteIOE> ioes;
         if (!tleProcessor.ReadAllTLE(ioes, config_.tleFilePath.c_str())) {
-            std::cerr << "Error: Failed to read TLE file: " << config_.tleFilePath << std::endl;
+            visualizer.printError("Failed to read TLE file: " + config_.tleFilePath);
             return results;
         }
 
         if (ioes.empty()) {
-            std::cerr << "Error: No TLE data found" << std::endl;
+            visualizer.printError("No TLE data found");
             return results;
         }
 
-        // 设置轨道根数
         tleProcessor.SetOrbitalElements(ioes[0]);
         tleProcessor.SetComputePositionOnly(false);
 
-        // 计算测站ECEF坐标
         const CartesianPosition siteECEF = site_.toECEF();
 
-        // 确定起始时间
         double startJD = config_.startJD > 0.0 ? config_.startJD : ioes[0].GetRefJD();
         double endJD = startJD + config_.endJD;
 
-        std::cout << "Processing satellite pass prediction..." << std::endl;
-        std::cout << "Time range: " << std::format("JD {:.6f}", startJD)
-                  << " to " << std::format("JD {:.6f}", endJD) << std::endl;
-        std::cout << "Site: Lat=" << std::format("{:.6f}", site_.latitude * RAD2DEG)
-                  << " deg, Lon=" << std::format("{:.6f}", site_.longitude * RAD2DEG) << " deg" << std::endl;
-        std::cout << std::endl;
+        visualizer.printSeparator('-', 72);
+        visualizer.printInfo("Site Latitude", site_.latitude * RAD2DEG, 4);
+        visualizer.printInfo("Site Longitude", site_.longitude * RAD2DEG, 4);
+        visualizer.printInfo("Site Height", site_.height, 1);
+        visualizer.printSeparator('-', 72);
 
-        // 时间步进计算
+        int year0, month0, day0, hour0, minute0;
+        double sec0;
+        DateTimeZ jdConv;
+        jdConv.JD2DateTime(startJD, year0, month0, day0, hour0, minute0, sec0);
+        int yearE, monthE, dayE, hourE, minuteE;
+        double secE;
+        jdConv.JD2DateTime(endJD, yearE, monthE, dayE, hourE, minuteE, secE);
+
+        std::cout << "\n";
+        visualizer.printHeader("Processing Satellite Pass Prediction");
+        std::cout << Color::BOLD << Color::BRIGHT_WHITE
+                  << "  Start: " << Color::BRIGHT_GREEN
+                  << std::format("{:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:02.0f} UTC",
+                                 year0, month0, day0, hour0, minute0, sec0)
+                  << Color::RESET << "\n";
+        std::cout << Color::BOLD << Color::BRIGHT_WHITE
+                  << "  End:   " << Color::BRIGHT_GREEN
+                  << std::format("{:04d}-{:02d}-{:02d} {:02d}:{:02d}:{:02.0f} UTC",
+                                 yearE, monthE, dayE, hourE, minuteE, secE)
+                  << Color::RESET << "\n\n";
+
+        std::cout << Color::BRIGHT_CYAN << "  Computing orbit..." << Color::RESET << "\r";
+        std::cout.flush();
+
+        const double firstJD = startJD;
+
         for (double tJD = startJD; tJD < endJD; tJD += config_.timeStep) {
-            // 计算卫星位置
             std::array<double, 3> satPos{}, satVel{};
             if (!tleProcessor.ComputeECEFPosVel(tJD, satPos.data(), satVel.data())) {
                 continue;
             }
 
-            // 计算方位角和仰角
             auto observation = calculateObservation(tJD, satPos, siteECEF);
+            if (!observation) continue;
 
-            // 检查是否可见 (仰角大于掩码)
-            if (observation && observation->elevation > config_.elevationMask) {
+            double timeHours = (tJD - firstJD) * 24.0;
+            SkyPoint sp{observation->azimuth * RAD2DEG,
+                        observation->elevation * RAD2DEG,
+                        timeHours};
+            allSkyPoints_.push_back(sp);
+
+            if (observation->elevation > config_.elevationMask) {
                 results.push_back(*observation);
             }
         }
 
-        std::cout << "Prediction complete. Found " << results.size() << " visible passes." << std::endl;
+        std::cout << Color::BRIGHT_GREEN << Color::BOLD
+                  << "  Prediction complete. "
+                  << Color::BRIGHT_YELLOW << allSkyPoints_.size() << " points computed, "
+                  << Color::BRIGHT_GREEN << results.size() << " visible points."
+                  << Color::RESET << "\n\n";
 
         return results;
     }
+
+    const std::vector<SkyPoint>& getSkyPoints() const { return allSkyPoints_; }
 
     /**
      * @brief 保存结果到文件
@@ -204,7 +238,6 @@ public:
     {
         std::ofstream outFile(filepath);
         if (!outFile.is_open()) {
-            std::cerr << "Error: Cannot open output file: " << filepath << std::endl;
             return false;
         }
 
@@ -226,7 +259,6 @@ public:
         }
 
         outFile.close();
-        std::cout << "Results saved to: " << filepath << std::endl;
         return true;
     }
 
@@ -234,6 +266,7 @@ private:
     SitePosition site_;
     PredictionConfig config_;
     CoordinateConverter coordinateConverter_;
+    std::vector<SkyPoint> allSkyPoints_;
 
     /**
      * @brief 计算单个观测点
@@ -327,37 +360,76 @@ public:
  */
 int main()
 {
-    std::cout << "========================================" << std::endl;
-    std::cout << "   Satellite Overpass Prediction System" << std::endl;
-    std::cout << "   Version 2.0.0 (Modern C++)" << std::endl;
-    std::cout << "========================================" << std::endl;
-    std::cout << std::endl;
+    TerminalVisualizer viz;
+
+    viz.printBanner();
 
     try {
-        // 配置测站位置 (示例)
-        auto site = SiteInfoBuilder::getDefaultSite();
+        viz.printHeader("Configuration");
 
-        // 配置预报参数
+        auto site = SiteInfoBuilder::getDefaultSite();
         auto config = SatellitePassPredictor::getDefaultConfig();
 
-        // 创建预报器并运行
+        viz.printInfo("TLE File", config.tleFilePath);
+        viz.printInfo("Output File", config.outputFilePath);
+        viz.printInfo("Time Step", std::format("{:.1f} sec", config.timeStep * 86400.0));
+        viz.printInfo("Elevation Mask", std::format("{:.1f} deg", config.elevationMask * RAD2DEG));
+        viz.printInfo("Duration", std::format("{:.1f} days", config.endJD));
+
         SatellitePassPredictor predictor(site, config);
-        auto results = predictor.runPrediction();
+        auto results = predictor.runPrediction(viz);
 
-        // 保存结果
-        if (!results.empty()) {
-            predictor.saveResults(results, config.outputFilePath);
+        const auto& skyPoints = predictor.getSkyPoints();
 
-            // 同时打印传统格式结果
-            std::cout << std::endl << "Traditional format output:" << std::endl;
-            printResultsTraditional(results);
+        if (!skyPoints.empty()) {
+            viz.drawSkyPlot(skyPoints, 16);
         }
 
-        std::cout << std::endl << "Prediction completed successfully." << std::endl;
+        if (!skyPoints.empty()) {
+            viz.drawElevationTimeline(skyPoints, 70, 18);
+        }
+
+        auto passes = TerminalVisualizer::extractPasses(skyPoints, 5.0);
+
+        if (!passes.empty()) {
+            viz.printPassSummary(passes);
+        }
+
+        viz.printHeader("Results");
+
+        if (!results.empty()) {
+            if (predictor.saveResults(results, config.outputFilePath)) {
+                viz.printSuccess("Saved " + std::to_string(results.size()) +
+                                 " visible observations to: " + config.outputFilePath);
+            } else {
+                viz.printError("Cannot open output file: " + config.outputFilePath);
+            }
+
+            viz.printSubSeparator('-', 72);
+            viz.printInfo("Visible Passes Found", static_cast<double>(passes.size()), 0);
+
+            if (!passes.empty()) {
+                viz.printInfo("Max Pass Elevation", passes[0].maxElevation, 1);
+            }
+
+            std::cout << "\n";
+
+            viz.printSeparator('-', 72);
+            std::cout << Color::DIM
+                      << "  Detailed observation data (traditional format):"
+                      << Color::RESET << "\n\n";
+            printResultsTraditional(results);
+        } else {
+            viz.printWarning("No visible passes found in the prediction window.");
+        }
+
+        std::cout << "\n";
+        viz.printSuccess("Prediction completed successfully.");
+        viz.printSeparator('=', 72);
         return 0;
 
     } catch (const std::exception& e) {
-        std::cerr << "Error: " << e.what() << std::endl;
+        viz.printError(std::string("Exception: ") + e.what());
         return 1;
     }
 }
