@@ -83,7 +83,7 @@ std::array<double, 3> CoordinateConverter::deltaBLHtoXYZ(
     return {
         matrix[0] * deltaBLH[0] + matrix[3] * deltaBLH[1] + matrix[6] * deltaBLH[2],
         matrix[1] * deltaBLH[0] + matrix[4] * deltaBLH[1] + matrix[7] * deltaBLH[2],
-        matrix[2] * deltaBLH[0] * deltaBLH[0] + matrix[5] * deltaBLH[1] + matrix[8] * deltaBLH[2]
+        matrix[2] * deltaBLH[0] + matrix[5] * deltaBLH[1] + matrix[8] * deltaBLH[2]
     };
 }
 

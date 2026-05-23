@@ -143,6 +143,8 @@ public:
         buildDetailedMessage(message, location);
     }
 
+    virtual ~SatelliteException() noexcept = default;
+
     /**
      * @brief 获取错误代码
      */
@@ -156,9 +158,9 @@ public:
     /**
      * @brief 获取错误消息
      */
-    constexpr std::string_view getErrorMessage() const noexcept
+    std::string_view getErrorMessage() const noexcept
     {
-        return getErrorMessage(errorCode_);
+        return ::SatelliteOverpass::Exceptions::getErrorMessage(errorCode_);
     }
 
     /**
@@ -184,7 +186,7 @@ public:
     /**
      * @brief 将异常转换为字符串
      */
-    std::string toString() const
+    virtual std::string toString() const
     {
         return std::format(
             "[Error {}] {} at {}:{} in function '{}'\n"
@@ -365,12 +367,12 @@ public:
     /**
      * @brief 检查是否成功
      */
-    constexpr bool isSuccess() const noexcept { return exception_ == nullptr; }
+    bool isSuccess() const noexcept { return exception_ == nullptr; }
 
     /**
      * @brief 检查是否失败
      */
-    constexpr bool isError() const noexcept { return exception_ != nullptr; }
+    bool isError() const noexcept { return exception_ != nullptr; }
 
     /**
      * @brief 获取值 (如果成功)
@@ -397,7 +399,7 @@ public:
     /**
      * @brief 获取异常指针
      */
-    constexpr std::exception_ptr getException() const noexcept { return exception_; }
+    std::exception_ptr getException() const noexcept { return exception_; }
 
     /**
      * @brief 转换异常并重新抛出
@@ -445,6 +447,86 @@ private:
     Result() noexcept
         : value_{}
         , exception_(std::make_exception_ptr(
+            SatelliteException("Uninitialized Result", ErrorCode::Unknown)))
+    {}
+};
+
+/**
+ * @brief Result偏特化，支持void类型
+ */
+template<>
+class Result<void>
+{
+public:
+    struct VoidDummy {};
+    static Result<void> success(VoidDummy = {}) noexcept
+    {
+        return Result(nullptr);
+    }
+
+    static Result<void> error(std::exception_ptr exception) noexcept
+    {
+        return Result(std::move(exception));
+    }
+
+    static Result<void> error(ErrorCode code, std::string message) noexcept
+    {
+        try {
+            return error(std::make_exception_ptr(
+                SatelliteException(std::move(message), code)));
+        } catch (...) {
+            return Result<void>();
+        }
+    }
+
+    bool isSuccess() const noexcept { return exception_ == nullptr; }
+    bool isError() const noexcept { return exception_ != nullptr; }
+
+    void value() const
+    {
+        if (exception_) {
+            std::rethrow_exception(exception_);
+        }
+    }
+
+    void valueOr() const noexcept {}
+
+    std::exception_ptr getException() const noexcept { return exception_; }
+
+    void throwIfError() const
+    {
+        if (exception_) {
+            std::rethrow_exception(exception_);
+        }
+    }
+
+    template<typename Func>
+    Result<void> andThen(Func&& func) const
+    {
+        if (isSuccess()) {
+            return func();
+        }
+        return Result<void>(exception_);
+    }
+
+    template<typename Func>
+    Result<void> orElse(Func&& func) const
+    {
+        if (isError()) {
+            return func(exception_);
+        }
+        return Result<void>(nullptr);
+    }
+
+private:
+    std::exception_ptr exception_;
+
+    explicit Result(std::exception_ptr ex) noexcept
+        : exception_(std::move(ex))
+    {}
+
+    Result() noexcept
+        : exception_(std::make_exception_ptr(
             SatelliteException("Uninitialized Result", ErrorCode::Unknown)))
     {}
 };

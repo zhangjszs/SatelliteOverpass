@@ -534,7 +534,7 @@ public:
      */
     static Vector<T, N> forwardSubstitution(
         const Matrix<T, N, N>& L,
-        const Vector<T, N>& b) noexcept
+        const Vector<T, N>& b)
     {
         Vector<T, N> y{};
         for (size_t i = 0; i < N; ++i) {
@@ -555,7 +555,7 @@ public:
      */
     static Vector<T, N> backwardSubstitution(
         const Matrix<T, N, N>& U,
-        const Vector<T, N>& y) noexcept
+        const Vector<T, N>& y)
     {
         Vector<T, N> x{};
         for (int i = static_cast<int>(N) - 1; i >= 0; --i) {
