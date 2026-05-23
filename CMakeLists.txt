@@ -93,4 +93,14 @@ if(BUILD_TESTING)
 
     include(GoogleTest)
     gtest_discover_tests(SatelliteOverpassTests)
+
+    add_executable(TestTheme
+        SatelliteOverpass/tests/test_theme.cpp
+    )
+    target_link_libraries(TestTheme PRIVATE SatelliteOverpassLib)
+    target_include_directories(TestTheme PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/SatelliteOverpass
+        ${CMAKE_CURRENT_SOURCE_DIR}/SatelliteOverpass/include
+    )
+    add_test(NAME TestTheme COMMAND TestTheme)
 endif()
