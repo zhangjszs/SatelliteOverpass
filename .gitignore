@@ -137,3 +137,7 @@ $RECYCLE.BIN/
 
 # oh-my-claudecode
 .omc/
+# AI tools (added by cleanup)
+.claude/
+.mimocode/
+.workbuddy/
